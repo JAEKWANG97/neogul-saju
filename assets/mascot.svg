@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 300" role="img" aria-labelledby="title desc">
+  <title id="title">너굴 사주 캐릭터 자리 표시 이미지</title>
+  <desc id="desc">외부에서 제작한 너굴 캐릭터 이미지로 교체할 수 있는 기본 일러스트입니다.</desc>
+  <defs>
+    <linearGradient id="cloak" x1="76" x2="194" y1="128" y2="258" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2d7a69"/>
+      <stop offset="1" stop-color="#1f554b"/>
+    </linearGradient>
+    <linearGradient id="scroll" x1="70" x2="190" y1="188" y2="230" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff5d7"/>
+      <stop offset="1" stop-color="#ffd590"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="132" cy="270" rx="74" ry="16" fill="#d9c6ad" opacity=".38"/>
+  <path fill="#f7efe5" d="M101 92c-8-21-8-47 4-72 23 16 35 42 31 67l-35 5Z"/>
+  <path fill="#f7efe5" d="M145 88c-1-25 13-50 39-67 9 28 5 54-11 74l-28-7Z"/>
+  <path fill="#f0c7ba" d="M113 78c-4-13-3-28 3-43 10 12 16 26 15 40l-18 3Z"/>
+  <path fill="#f0c7ba" d="M153 75c2-14 9-27 22-39 3 16 0 31-8 43l-14-4Z"/>
+  <circle cx="132" cy="111" r="56" fill="#fff9ef"/>
+  <path fill="#eaded0" d="M80 123c8 28 31 44 59 44 21 0 38-9 49-26-9 30-30 47-58 47-27 0-47-17-50-65Z" opacity=".6"/>
+  <circle cx="111" cy="106" r="7" fill="#2a211c"/>
+  <circle cx="153" cy="106" r="7" fill="#2a211c"/>
+  <path fill="none" stroke="#2a211c" stroke-linecap="round" stroke-width="5" d="M124 126c5 5 13 5 18 0"/>
+  <circle cx="91" cy="122" r="10" fill="#f2b9a8" opacity=".75"/>
+  <circle cx="174" cy="122" r="10" fill="#f2b9a8" opacity=".75"/>
+  <path fill="url(#cloak)" d="M68 254c8-62 19-92 45-112 13 11 31 12 45 0 27 20 38 51 45 112H68Z"/>
+  <path fill="#e86f58" d="M110 145c9 8 37 8 47 0l-11 41h-25l-11-41Z"/>
+  <path fill="none" stroke="#fff2d4" stroke-linecap="round" stroke-width="7" d="M94 174c15 11 30 17 45 17 14 0 27-5 39-15"/>
+  <rect width="114" height="42" x="73" y="190" fill="url(#scroll)" rx="18" transform="rotate(-6 130 211)"/>
+  <circle cx="79" cy="207" r="16" fill="#ffe3aa"/>
+  <circle cx="187" cy="196" r="16" fill="#ffe3aa"/>
+  <path fill="none" stroke="#a06a22" stroke-linecap="round" stroke-width="5" d="M103 208h54M111 220h33"/>
+  <circle cx="190" cy="174" r="18" fill="#d9a23a"/>
+  <path fill="#fff8da" d="m190 161 4 9 9 4-9 4-4 9-4-9-9-4 9-4 4-9Z"/>
+</svg>

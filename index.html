@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>너굴 사주</title>
+    <meta name="description" content="모바일 전용 사주, 운세, 궁합 서비스">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="너굴 사주">
+    <meta property="og:title" content="너굴 사주 - 오늘 운세, 너굴이가 봐드림">
+    <meta property="og:description" content="수정구슬 앞의 느긋한 점술사 너굴이와 오늘의 사주 흐름을 확인해보세요.">
+    <meta property="og:image" content="assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="너굴 사주 - 오늘 운세, 너굴이가 봐드림">
+    <meta name="twitter:description" content="수정구슬 앞의 느긋한 점술사 너굴이와 오늘의 사주 흐름을 확인해보세요.">
+    <meta name="twitter:image" content="assets/og-image.png">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="phone-shell" aria-label="너굴 사주 모바일 홈">
+      <header class="top-bar">
+        <a class="brand" href="#" aria-label="너굴 사주 홈">
+          <span class="brand-mark" aria-hidden="true">너</span>
+          <span>너굴 사주</span>
+        </a>
+        <div class="top-actions">
+          <button class="share-button js-kakao-share" type="button" aria-label="카카오톡 공유">공유</button>
+          <button class="login-button js-kakao-login" type="button">로그인</button>
+        </div>
+      </header>
+
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">수정구슬 앞의 느긋한 점술사</p>
+          <h1 id="hero-title">오늘 운세, 너굴이가 봐드림</h1>
+          <p>생년월일과 시간을 바탕으로 연애, 재물, 직장 흐름을 모바일에 맞게 빠르게 보여드립니다.</p>
+        </div>
+        <div class="mascot">
+          <img src="assets/mascot.png" alt="너굴 사주 캐릭터" onerror="this.onerror=null;this.src='assets/mascot.svg';">
+        </div>
+      </section>
+
+      <section class="login-panel" aria-labelledby="login-title">
+        <img class="login-illust" src="assets/kakao-login-illustration.png" alt="" loading="lazy">
+        <div>
+          <p class="panel-kicker">간편 시작</p>
+          <h2 id="login-title">카카오톡으로 이어보기</h2>
+          <p id="login-status">로그인하면 입력한 생년월일과 운세 결과를 저장할 수 있습니다.</p>
+        </div>
+        <button class="kakao-button js-kakao-login" type="button">
+          <span class="kakao-icon" aria-hidden="true">톡</span>
+          <span>카카오 로그인</span>
+        </button>
+      </section>
+
+      <nav class="fortune-grid" aria-label="운세 메뉴">
+        <button class="fortune-card active" type="button" data-topic="today">
+          <span class="card-icon sun" aria-hidden="true"></span>
+          <strong>오늘운세</strong>
+          <small>하루 흐름</small>
+        </button>
+        <button class="fortune-card" type="button" data-topic="love">
+          <span class="card-icon heart" aria-hidden="true"></span>
+          <strong>애정운</strong>
+          <small>관계 기류</small>
+        </button>
+        <button class="fortune-card" type="button" data-topic="money">
+          <span class="card-icon coin" aria-hidden="true"></span>
+          <strong>재물운</strong>
+          <small>수입과 지출</small>
+        </button>
+        <button class="fortune-card" type="button" data-topic="career">
+          <span class="card-icon bag" aria-hidden="true"></span>
+          <strong>직장운</strong>
+          <small>일과 기회</small>
+        </button>
+        <button class="fortune-card" type="button" data-topic="match">
+          <span class="card-icon link" aria-hidden="true"></span>
+          <strong>궁합</strong>
+          <small>상대와 인연</small>
+        </button>
+        <button class="fortune-card" type="button" data-topic="year">
+          <span class="card-icon moon" aria-hidden="true"></span>
+          <strong>신년운세</strong>
+          <small>올해 방향</small>
+        </button>
+      </nav>
+
+      <section class="panel" aria-live="polite">
+        <img class="panel-illust" src="assets/fortune-result-illustration.png" alt="" loading="lazy">
+        <div>
+          <p class="panel-kicker" id="topic-kicker">오늘운세</p>
+          <h2 id="topic-title">오늘의 기운은 차분한 정리운입니다</h2>
+          <p id="topic-copy">미뤄둔 연락, 정산, 일정 정리에 유리합니다. 큰 결정보다는 작게 정리하는 선택이 더 좋습니다.</p>
+        </div>
+        <button class="primary-button js-start-reading" type="button">무료로 보기</button>
+      </section>
+
+      <section class="rank-section" aria-labelledby="rank-title">
+        <div class="section-head">
+          <div>
+            <p class="panel-kicker">무료 콘텐츠</p>
+            <h2 id="rank-title">이번 주 인연 랭킹</h2>
+          </div>
+          <button class="text-button js-show-history" type="button">기록</button>
+        </div>
+        <ol class="rank-list">
+          <li>
+            <span class="rank-num">1</span>
+            <div>
+              <strong>말이 잘 통하는 사람</strong>
+              <small>가까운 지인 모임에서 흐름이 열립니다</small>
+            </div>
+          </li>
+          <li>
+            <span class="rank-num">2</span>
+            <div>
+              <strong>느린 답장에도 안정적인 사람</strong>
+              <small>속도보다 꾸준함을 보세요</small>
+            </div>
+          </li>
+          <li>
+            <span class="rank-num">3</span>
+            <div>
+              <strong>취향이 다른 사람</strong>
+              <small>새 관점이 좋은 자극이 됩니다</small>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="quick-form page-panel" id="fortune-form" aria-labelledby="form-title">
+        <div class="section-head compact">
+          <div>
+            <p class="panel-kicker">맞춤 운세</p>
+            <h2 id="form-title">맞춤 사주 입력</h2>
+          </div>
+          <button class="text-button js-scroll-top" type="button">위로</button>
+        </div>
+        <form class="fortune-form" id="saju-form">
+          <label>
+            닉네임
+            <input name="nickname" type="text" placeholder="예: 너굴이" maxlength="16" autocomplete="nickname">
+          </label>
+          <label>
+            생년월일
+            <input name="birthDate" type="date" value="1998-01-01" required>
+          </label>
+          <div class="field-row">
+            <label>
+              양/음력
+              <select name="calendarType">
+                <option value="solar">양력</option>
+                <option value="lunar">음력</option>
+              </select>
+            </label>
+            <label>
+              성별
+              <select name="gender">
+                <option value="unspecified">선택 안 함</option>
+                <option value="female">여성</option>
+                <option value="male">남성</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            태어난 시간
+            <select name="birthTime">
+              <option value="unknown">시간 모름</option>
+              <option value="子">자시 23:00-00:59</option>
+              <option value="丑">축시 01:00-02:59</option>
+              <option value="寅">인시 03:00-04:59</option>
+              <option value="卯">묘시 05:00-06:59</option>
+              <option value="辰">진시 07:00-08:59</option>
+              <option value="巳">사시 09:00-10:59</option>
+              <option value="午">오시 11:00-12:59</option>
+              <option value="未">미시 13:00-14:59</option>
+              <option value="申">신시 15:00-16:59</option>
+              <option value="酉">유시 17:00-18:59</option>
+              <option value="戌">술시 19:00-20:59</option>
+              <option value="亥">해시 21:00-22:59</option>
+            </select>
+          </label>
+          <label>
+            보고 싶은 운세
+            <select name="topic">
+              <option value="today">오늘운세</option>
+              <option value="love">애정운</option>
+              <option value="money">재물운</option>
+              <option value="career">직장운</option>
+              <option value="match">궁합</option>
+              <option value="year">신년운세</option>
+            </select>
+          </label>
+          <label>
+            지금 궁금한 것
+            <textarea name="question" rows="3" maxlength="160" placeholder="예: 이번 주 이직 면접 흐름이 궁금해요."></textarea>
+          </label>
+          <button class="secondary-button" type="submit">너굴이에게 물어보기</button>
+        </form>
+      </section>
+
+      <section class="loading-panel page-panel is-hidden" id="loading-page" aria-live="polite">
+        <img src="assets/fortune-result-illustration.png" alt="" loading="lazy">
+        <p class="panel-kicker">생성 중</p>
+        <h2>너굴이가 수정구슬을 들여다보는 중</h2>
+        <p>입력한 정보를 바탕으로 오늘 읽기 좋은 문장으로 정리하고 있습니다.</p>
+        <div class="loading-bar" aria-hidden="true"><span></span></div>
+      </section>
+
+      <section class="result-page page-panel is-hidden" id="result-page" aria-live="polite">
+        <div class="section-head">
+          <div>
+            <p class="panel-kicker" id="result-topic">오늘운세</p>
+            <h2 id="result-title">운세 결과</h2>
+          </div>
+          <button class="text-button js-kakao-share" type="button">공유</button>
+        </div>
+        <p class="result-summary" id="result-summary"></p>
+        <div class="score-grid" id="score-grid"></div>
+        <div class="result-block">
+          <h3>좋은 흐름</h3>
+          <ul id="result-good"></ul>
+        </div>
+        <div class="result-block">
+          <h3>주의할 점</h3>
+          <ul id="result-caution"></ul>
+        </div>
+        <div class="result-block">
+          <h3>오늘의 행동</h3>
+          <ul id="result-actions"></ul>
+        </div>
+        <div class="result-actions">
+          <button class="secondary-button js-start-reading" type="button">다시 보기</button>
+          <button class="ghost-button js-show-history" type="button">기록 보기</button>
+        </div>
+      </section>
+
+      <section class="history-page page-panel is-hidden" id="history-page">
+        <div class="section-head">
+          <div>
+            <p class="panel-kicker">내 기록</p>
+            <h2>최근 운세</h2>
+          </div>
+          <button class="text-button js-clear-history" type="button">비우기</button>
+        </div>
+        <div class="history-list" id="history-list"></div>
+      </section>
+
+      <footer class="footer">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+        <a href="#">문의하기</a>
+      </footer>
+    </main>
+
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.8.1/kakao.min.js" integrity="sha384-OL+ylM/iuPLtW5U3XcvLSGhE8JzReKDank5InqlHGWPhb4140/yrBw0bg0y7+C9J" crossorigin="anonymous"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
