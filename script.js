@@ -46,7 +46,6 @@ const title = document.querySelector("#topic-title");
 const copy = document.querySelector("#topic-copy");
 const loginButtons = document.querySelectorAll(".js-kakao-login");
 const shareButtons = document.querySelectorAll(".js-kakao-share");
-const loginStatus = document.querySelector("#login-status");
 const startButtons = document.querySelectorAll(".js-start-reading");
 const historyButtons = document.querySelectorAll(".js-show-history");
 const scrollTopButtons = document.querySelectorAll(".js-scroll-top");
@@ -81,9 +80,7 @@ cards.forEach((card) => {
 });
 
 function setLoginStatus(message) {
-  if (loginStatus) {
-    loginStatus.textContent = message;
-  }
+  console.info(message);
 }
 
 function initKakao() {
@@ -93,7 +90,7 @@ function initKakao() {
   }
 
   if (!kakaoConfig.kakaoJavaScriptKey) {
-    setLoginStatus("config.js에 카카오 JavaScript 키를 넣으면 로그인 버튼이 활성화됩니다.");
+    setLoginStatus("Kakao JavaScript key is not configured.");
     return false;
   }
 

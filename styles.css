@@ -202,69 +202,6 @@ button {
   filter: drop-shadow(0 18px 18px rgba(76, 49, 23, 0.2));
 }
 
-.login-panel {
-  display: grid;
-  grid-template-columns: 92px 1fr;
-  align-items: center;
-  gap: 14px;
-  margin-top: 14px;
-  padding: 16px;
-  border: 1px solid #ead2a3;
-  border-radius: 22px;
-  background:
-    linear-gradient(135deg, rgba(255, 245, 210, 0.96), rgba(255, 250, 243, 0.88)),
-    var(--panel);
-  box-shadow: 0 10px 28px rgba(106, 75, 20, 0.1);
-}
-
-.login-illust {
-  width: 92px;
-  aspect-ratio: 1;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 12px rgba(76, 49, 23, 0.14));
-}
-
-.login-panel h2 {
-  margin: 0;
-  font-size: 20px;
-  letter-spacing: 0;
-}
-
-.login-panel p:last-child {
-  margin: 7px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.kakao-button {
-  grid-column: 1 / -1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  width: 100%;
-  min-height: 50px;
-  border: 0;
-  border-radius: 16px;
-  background: #fee500;
-  color: #191600;
-  font-weight: 900;
-  box-shadow: 0 10px 18px rgba(181, 144, 0, 0.18);
-}
-
-.kakao-icon {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border-radius: 50%;
-  background: #191600;
-  color: #fee500;
-  font-size: 11px;
-  font-weight: 900;
-}
-
 .fortune-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
