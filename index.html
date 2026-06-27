@@ -4,18 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>너굴 사주</title>
-    <meta name="description" content="모바일 전용 사주, 운세, 궁합 서비스">
+    <meta name="description" content="설치 없이 링크 하나로 친구들과 보는 단톡방 사주 궁합판">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://neogul-saju.vercel.app/">
     <meta property="og:site_name" content="너굴 사주">
-    <meta property="og:title" content="너굴 사주 - 오늘 운세, 너굴이가 봐드림">
-    <meta property="og:description" content="수정구슬 앞의 느긋한 점술사 너굴이와 오늘의 사주 흐름을 확인해보세요.">
+    <meta property="og:title" content="너굴 사주 - 단톡방 궁합판">
+    <meta property="og:description" content="설치 없이 링크 하나로 친구들과 사주 궁합 순위를 확인해보세요.">
     <meta property="og:image" content="https://neogul-saju.vercel.app/assets/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="너굴 사주 - 오늘 운세, 너굴이가 봐드림">
-    <meta name="twitter:description" content="수정구슬 앞의 느긋한 점술사 너굴이와 오늘의 사주 흐름을 확인해보세요.">
+    <meta name="twitter:title" content="너굴 사주 - 단톡방 궁합판">
+    <meta name="twitter:description" content="설치 없이 링크 하나로 친구들과 사주 궁합 순위를 확인해보세요.">
     <meta name="twitter:image" content="https://neogul-saju.vercel.app/assets/og-image.png">
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -35,9 +35,18 @@
       <div id="home-view">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">수정구슬 앞의 느긋한 점술사</p>
-          <h1 id="hero-title">오늘 운세, 너굴이가 봐드림</h1>
-          <p>생년월일과 시간을 바탕으로 연애, 재물, 직장 흐름을 모바일에 맞게 빠르게 보여드립니다.</p>
+          <p class="eyebrow">친구들이 들어올수록 완성되는</p>
+          <h1 id="hero-title">단톡방 사주 궁합판</h1>
+          <p>앱 설치 없이 링크 하나로 참여하고, 나랑 제일 잘 맞는 사람과 TOP 궁합 순위를 바로 확인하세요.</p>
+          <div class="hero-actions">
+            <button class="primary-button hero-cta js-create-room" type="button">단톡방 궁합판 만들기</button>
+            <button class="ghost-button hero-secondary js-start-reading" type="button">내 운세 먼저 보기</button>
+          </div>
+          <ul class="hero-proof" aria-label="참여 방식">
+            <li>설치 없음</li>
+            <li>로그인 없음</li>
+            <li>결제 없음</li>
+          </ul>
         </div>
         <div class="mascot">
           <img src="assets/neogulman.png" alt="너굴 사주 캐릭터 너굴맨" onerror="this.onerror=null;this.src='assets/mascot.png';">
@@ -77,44 +86,20 @@
         </button>
       </nav>
 
-      <section class="rank-section" aria-labelledby="rank-title">
-        <div class="section-head">
-          <div>
-            <p class="panel-kicker">무료 콘텐츠</p>
-            <h2 id="rank-title">이번 주 인연 랭킹</h2>
-          </div>
-          <button class="text-button js-show-history" type="button">기록</button>
+      <section class="room-promo page-panel" aria-labelledby="room-promo-title">
+        <div>
+          <p class="panel-kicker">카톡 단톡방용</p>
+          <h2 id="room-promo-title">친구가 들어와야 순위가 뒤집혀요</h2>
+          <p>먼저 방을 만들고 링크를 보내세요. 친구들이 닉네임과 생년월일만 넣으면 관계 케미가 하나씩 열립니다.</p>
         </div>
-        <ol class="rank-list">
-          <li>
-            <span class="rank-num">1</span>
-            <div>
-              <strong>말이 잘 통하는 사람</strong>
-              <small>가까운 지인 모임에서 흐름이 열립니다</small>
-            </div>
-          </li>
-          <li>
-            <span class="rank-num">2</span>
-            <div>
-              <strong>느린 답장에도 안정적인 사람</strong>
-              <small>속도보다 꾸준함을 보세요</small>
-            </div>
-          </li>
-          <li>
-            <span class="rank-num">3</span>
-            <div>
-              <strong>취향이 다른 사람</strong>
-              <small>새 관점이 좋은 자극이 됩니다</small>
-            </div>
-          </li>
-        </ol>
+        <button class="secondary-button js-create-room" type="button">궁합판 바로 만들기</button>
       </section>
 
       <section class="quick-form page-panel is-hidden" id="fortune-form" aria-labelledby="form-title">
         <div class="section-head compact">
           <div>
-            <p class="panel-kicker">맞춤 운세</p>
-            <h2 id="form-title">맞춤 사주 입력</h2>
+            <p class="panel-kicker">워밍업 운세</p>
+            <h2 id="form-title">내 흐름 먼저 보기</h2>
           </div>
           <button class="text-button js-scroll-top" type="button">위로</button>
         </div>
@@ -125,7 +110,7 @@
           </label>
           <label>
             생년월일
-            <input name="birthDate" type="date" value="1998-01-01" required>
+            <input name="birthDate" type="date" required>
           </label>
           <div class="field-row">
             <label>
@@ -182,7 +167,7 @@
             </label>
             <label>
               상대 생년월일
-              <input name="partnerBirthDate" type="date" value="1998-01-01">
+              <input name="partnerBirthDate" type="date">
             </label>
             <div class="field-row">
               <label>
@@ -227,11 +212,44 @@
           <button class="secondary-button" type="submit">너굴이에게 물어보기</button>
         </form>
       </section>
+
+      <section class="rank-section" aria-labelledby="rank-title">
+        <div class="section-head">
+          <div>
+            <p class="panel-kicker">무료 콘텐츠</p>
+            <h2 id="rank-title">이번 주 인연 랭킹</h2>
+          </div>
+          <button class="text-button js-show-history" type="button">기록</button>
+        </div>
+        <ol class="rank-list">
+          <li>
+            <span class="rank-num">1</span>
+            <div>
+              <strong>말이 잘 통하는 사람</strong>
+              <small>가까운 지인 모임에서 흐름이 열립니다</small>
+            </div>
+          </li>
+          <li>
+            <span class="rank-num">2</span>
+            <div>
+              <strong>느린 답장에도 안정적인 사람</strong>
+              <small>속도보다 꾸준함을 보세요</small>
+            </div>
+          </li>
+          <li>
+            <span class="rank-num">3</span>
+            <div>
+              <strong>취향이 다른 사람</strong>
+              <small>새 관점이 좋은 자극이 됩니다</small>
+            </div>
+          </li>
+        </ol>
+      </section>
       </div>
 
       <section class="loading-panel page-panel is-hidden" id="loading-page" aria-live="polite">
         <img src="assets/neogulman-curious.png" alt="" loading="lazy">
-        <p class="panel-kicker">생성 중</p>
+        <p class="panel-kicker">읽는 중</p>
         <h2>너굴이가 수정구슬을 들여다보는 중</h2>
         <p>입력한 정보를 바탕으로 오늘 읽기 좋은 문장으로 정리하고 있습니다.</p>
         <div class="loading-bar" aria-hidden="true"><span></span></div>
@@ -249,7 +267,12 @@
           </div>
         </div>
         <img class="result-mascot" src="assets/neogulman-confident.png" alt="" loading="lazy">
+        <div class="neogul-line">
+          <p class="panel-kicker">너굴 한마디</p>
+          <strong id="result-one-liner"></strong>
+        </div>
         <p class="result-summary" id="result-summary"></p>
+        <div class="result-scene" id="result-scene"></div>
         <div class="score-grid" id="score-grid"></div>
         <div class="result-block">
           <h3>좋은 흐름</h3>
@@ -263,11 +286,15 @@
           <h3>오늘의 행동</h3>
           <ul id="result-actions"></ul>
         </div>
+        <details class="result-block result-basis">
+          <summary>왜 이렇게 봤냐면요</summary>
+          <ul id="result-basis"></ul>
+        </details>
         <div class="result-room-cta">
           <p class="panel-kicker">단톡방 궁합</p>
-          <p class="result-room-text">친구들이랑 TOP 궁합까지 볼래?</p>
-          <p class="result-room-sub">방을 만들고 링크를 공유하면 참여자끼리 가장 잘 맞는 조합을 바로 볼 수 있어요.</p>
-          <button class="primary-button js-create-room" type="button">내 궁합 방 만들기</button>
+          <p class="result-room-text">이 흐름, 친구들이 들어오면 더 재밌어요</p>
+          <p class="result-room-sub">내 입력 정보로 먼저 참여되고, 친구가 들어올수록 베스트 매치와 TOP 궁합이 열려요.</p>
+          <button class="primary-button js-create-room" type="button">단톡방 궁합판 만들기</button>
         </div>
         <div class="result-actions">
           <button class="secondary-button js-start-reading" type="button">다시 보기</button>
@@ -278,14 +305,15 @@
       <section class="history-page page-panel is-hidden" id="history-page">
         <div class="section-head">
           <div>
-            <p class="panel-kicker">내 기록</p>
-            <h2>최근 운세</h2>
+            <p class="panel-kicker">내 흐름 보관함</p>
+            <h2>최근 흐름</h2>
           </div>
           <div class="head-actions">
             <button class="text-button js-go-home" type="button">← 홈</button>
             <button class="text-button js-clear-history" type="button">비우기</button>
           </div>
         </div>
+        <div class="history-pattern" id="history-pattern"></div>
         <div class="history-list" id="history-list"></div>
       </section>
 
@@ -304,7 +332,7 @@
           <div>
             <p class="panel-kicker">단톡방 궁합판</p>
             <h3>친구들이 들어올수록 순위가 바뀌어요</h3>
-            <p>내 정보를 넣고 방에 참여하면 TOP 궁합과 나의 베스트 매치를 바로 확인할 수 있어요.</p>
+            <p>닉네임과 생년월일만 넣으면 관계 케미가 열리고, 새 친구가 들어올 때마다 순위가 바뀝니다.</p>
           </div>
           <img src="assets/neogulman-curious.png" alt="" loading="lazy">
         </div>
@@ -323,7 +351,7 @@
             </label>
             <label>
               생년월일
-              <input name="birthDate" type="date" value="1998-01-01" required>
+              <input name="birthDate" type="date" required>
             </label>
             <div class="field-row">
               <label>
@@ -376,14 +404,35 @@
             </div>
           </div>
 
+          <div class="unlock-panel" id="room-unlock-panel"></div>
+
+          <div class="room-invite-card">
+            <div>
+              <p class="panel-kicker">초대하기</p>
+              <strong id="room-invite-title">친구가 들어와야 궁합판이 완성돼요</strong>
+              <span id="room-invite-text">로그인 없이 닉네임과 생년월일만 넣으면 참여할 수 있어요.</span>
+            </div>
+            <button class="secondary-button js-share-room" type="button">친구 초대하기</button>
+          </div>
+
           <div class="room-people">
             <p class="panel-kicker">참여한 친구들</p>
             <ul class="people-chips" id="room-people-list"></ul>
           </div>
 
-          <div class="result-block">
+          <div class="result-block" id="room-top-block">
             <h3>최고의 궁합 TOP</h3>
             <ol class="match-rank" id="room-top-list"></ol>
+          </div>
+
+          <div class="result-block" id="room-surprise-block">
+            <h3>의외의 케미</h3>
+            <div class="surprise-match" id="room-surprise-match"></div>
+          </div>
+
+          <div class="result-block" id="room-vibe-block">
+            <h3>오늘의 단톡방 운세</h3>
+            <p class="room-vibe" id="room-vibe"></p>
           </div>
 
           <div class="result-block" id="room-mine-block">

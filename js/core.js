@@ -155,13 +155,13 @@ function startKakaoShare() {
 
   const imageUrl = new URL(kakaoConfig.shareImage || "assets/og-image.png", window.location.href).href;
   const titleText = latestResult
-    ? `내 너굴 사주: ${latestResult.title}`
-    : "너굴 사주 - 오늘 내 흐름 보기";
-  const summary = latestResult?.summary || "수정구슬 앞의 느긋한 점술사 너굴이와 오늘의 사주 흐름을 확인해보세요.";
+    ? "너굴 사주에서 내 흐름 확인함"
+    : "너굴 사주 - 단톡방 궁합판";
+  const summary = latestResult?.oneLiner || latestResult?.summary || "설치 없이 링크 하나로 친구들과 사주 궁합 순위를 확인해보세요.";
   const description = latestResult
-    ? `${summary.slice(0, 72)}${summary.length > 72 ? "..." : ""} 너도 한번 봐봐.`
+    ? `${summary.slice(0, 64)}${summary.length > 64 ? "..." : ""} 너도 생년월일 넣고 한번 봐봐.`
     : summary;
-  const buttonTitle = latestResult ? "내 사주도 보기" : "운세 보러가기";
+  const buttonTitle = latestResult ? "나도 운세 보기" : "궁합판 만들기";
 
   try {
     window.Kakao.Share.sendDefault({

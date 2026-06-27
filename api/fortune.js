@@ -10,8 +10,8 @@ const {
 
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const FORTUNE_LIMIT_PER_HOUR = 60; // IP당 시간당 운세 생성 상한
-const MAX_OUTPUT_TOKENS = 1000;    // 출력 토큰 상한 (비용 캡)
-const PROMPT_VERSION = "saju-origin-v1";
+const MAX_OUTPUT_TOKENS = 1200;    // 출력 토큰 상한 (비용 캡)
+const PROMPT_VERSION = "saju-origin-v2";
 
 const fortuneSchema = {
   type: "object",
@@ -19,7 +19,9 @@ const fortuneSchema = {
   properties: {
     topic: { type: "string" },
     title: { type: "string" },
+    oneLiner: { type: "string" },
     summary: { type: "string" },
+    scene: { type: "string" },
     scores: {
       type: "object",
       additionalProperties: false,
@@ -32,9 +34,10 @@ const fortuneSchema = {
     },
     good: { type: "array", items: { type: "string" } },
     caution: { type: "array", items: { type: "string" } },
-    actions: { type: "array", items: { type: "string" } }
+    actions: { type: "array", items: { type: "string" } },
+    basis: { type: "array", items: { type: "string" } }
   },
-  required: ["topic", "title", "summary", "scores", "good", "caution", "actions"]
+  required: ["topic", "title", "oneLiner", "summary", "scene", "scores", "good", "caution", "actions", "basis"]
 };
 
 /* ----------------------------- 캐시 키/TTL ----------------------------- */
@@ -138,11 +141,14 @@ function buildPrompt(body) {
     "",
     "결과 작성 규칙:",
     "- title은 사주 해석처럼 품격 있게 쓰되 궁금해서 눌러보고 싶은 맛이 있어야 하며, 20자 안팎으로 쓴다.",
+    "- oneLiner는 카톡에 공유하기 좋은 한 문장으로 쓴다. 예언보다 '오늘 내가 어떤 상태인지'가 느껴져야 한다.",
     "- summary는 3문장으로 쓴다. 첫 문장은 전체 기운, 둘째 문장은 그 기운이 현실에서 드러나는 구체적 장면, 셋째 문장은 오늘/올해/관계에서 잡아야 할 태도다.",
+    "- scene은 카톡 답장, 회의, 약속, 지출, 말투, 타이밍 중 하나 이상이 들어간 생활 장면 1-2문장으로 쓴다.",
     "- scores는 서로 너무 비슷하게 주지 말고, 해석과 자연스럽게 맞춘다.",
     "- good은 좋은 흐름을 3개로 쓰되 각각 다른 관점이어야 하며, 한 항목은 가볍게 미소가 나는 표현을 허용한다.",
     "- caution은 주의할 점을 2-3개로 쓰되 겁주는 표현보다 조절 포인트로 쓴다.",
     "- actions는 당장 실행 가능한 행동 3개로 쓰고, 너무 도덕 교과서처럼 쓰지 않는다.",
+    "- basis는 왜 그렇게 봤는지 3개로 쓴다. 오행, 일간, 계절감, 십신을 쉬운 말로 풀되 한자와 어려운 용어를 앞세우지 않는다.",
     "- 각 배열 항목은 한 문장으로 끝내고, 지나치게 길게 쓰지 않으며, 반드시 마침표로 마무리한다.",
     "- 응답은 반드시 JSON 객체만 출력한다.",
     "",
@@ -184,11 +190,14 @@ function buildPrompt(body) {
     "{",
     '  "topic": "오늘운세|애정운|재물운|직장운|궁합|신년운세",',
     '  "title": "품격 있는 짧은 제목",',
+    '  "oneLiner": "공유하기 좋은 너굴 한마디",',
     '  "summary": "3문장 깊이 있는 요약",',
+    '  "scene": "생활 장면 중심의 해석",',
     '  "scores": { "love": 0-100, "money": 0-100, "career": 0-100 },',
     '  "good": ["좋은 흐름 3개"],',
     '  "caution": ["주의할 점 2-3개"],',
-    '  "actions": ["실행할 행동 3개"]',
+    '  "actions": ["실행할 행동 3개"],',
+    '  "basis": ["쉬운 사주 근거 3개"]',
     "}"
   ]).join("\n");
 }

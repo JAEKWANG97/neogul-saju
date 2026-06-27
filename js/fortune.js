@@ -45,6 +45,7 @@ const historyKey = "neogul-saju-history";
 
 let selectedTopic = "today";
 let latestResult = null;
+let fortuneRequestPending = false;
 
 function togglePartnerFields(topic) {
   const isMatch = topic === "match";
@@ -137,7 +138,9 @@ function createDemoFortune(payload) {
     return Promise.resolve({
       topic: label,
       title: `${name}님과 ${partnerName}님은 보완되는 궁합입니다`,
+      oneLiner: "속도는 달라도 역할이 나뉘면 오래 가는 조합이에요.",
       summary: `서로 속도가 달라 보여도 역할이 나뉘면 안정적인 흐름이 됩니다. 비슷함보다 채워주는 부분을 보세요.${question}`,
+      scene: "카톡 답장 속도나 약속 잡는 방식이 달라 보여도, 한 사람이 먼저 움직이고 다른 사람이 정리하면 관계가 편해집니다.",
       scores: { love: 76, money: 60, career: 68 },
       good: [
         "표현 방식이 달라 처음엔 어색해도 곧 서로의 리듬을 이해하게 됩니다.",
@@ -153,6 +156,11 @@ function createDemoFortune(payload) {
         "서로의 다른 점을 단점이 아니라 역할로 바라보기",
         "다음 만남 일정을 먼저 가볍게 제안하기"
       ],
+      basis: [
+        "두 사람의 기운은 같은 방향으로만 흐르기보다 서로 빈 곳을 채우는 쪽에 가깝습니다.",
+        "일간의 결이 다르면 처음엔 속도 차이가 보이지만, 역할을 나누면 안정감이 생깁니다.",
+        "계절감이 다른 사람끼리는 말투보다 타이밍을 맞출 때 관계가 부드러워집니다."
+      ],
       source: "demo"
     });
   }
@@ -160,7 +168,9 @@ function createDemoFortune(payload) {
   return Promise.resolve({
     topic: label,
     title: `${name}님, ${label}은 천천히 풀리는 흐름입니다`,
+    oneLiner: "오늘은 크게 밀기보다 타이밍을 고르는 사람이 유리해요.",
     summary: `오늘은 크게 밀어붙이기보다 정리, 관찰, 짧은 실행이 잘 맞습니다.${question}`,
+    scene: "카톡 답장을 바로 보내기보다 한 번 읽고, 회의나 약속에서는 먼저 정리한 한마디를 꺼내는 쪽이 좋습니다.",
     scores: { love: 72, money: 64, career: 78 },
     good: [
       "오전에 짧게 처리할 일을 끝내면 오후 흐름이 가벼워집니다.",
@@ -176,8 +186,45 @@ function createDemoFortune(payload) {
       "중요한 메시지는 짧고 분명하게 보내기",
       "밤에는 내일 결정할 일을 미리 정리해두기"
     ],
+    basis: [
+      "오늘의 흐름은 한쪽 기운이 과하게 앞서기보다 균형을 맞추는 쪽에 힘이 실립니다.",
+      "일간의 성향은 빠른 판단보다 기준을 세운 뒤 움직일 때 더 편안하게 드러납니다.",
+      "십신의 흐름으로 보면 말과 행동의 순서를 바꾸는 것만으로도 결과가 달라지기 쉽습니다."
+    ],
     source: "demo"
   });
+}
+
+function firstSentence(text) {
+  return String(text || "").split(/(?<=[.!?。]|[.?!])\s*/)[0]?.trim() || "";
+}
+
+function fallbackOneLiner(result, payload) {
+  if (result.oneLiner) return result.oneLiner;
+  const sentence = firstSentence(result.summary);
+  if (sentence) return sentence;
+  if (payload.topic === "match") return "이 관계는 비슷해서 편한 쪽보다 달라서 역할이 생기는 쪽이에요.";
+  return "너굴이가 보기엔, 오늘은 말의 양보다 타이밍이 더 중요합니다.";
+}
+
+function fallbackScene(result, payload) {
+  if (result.scene) return result.scene;
+  if (payload.topic === "money") return "지갑을 여는 순간 한 번만 멈추면, 필요한 소비와 기분 소비가 분리됩니다.";
+  if (payload.topic === "career") return "회의에서 길게 설명하기보다 정리된 한 문장이 더 좋은 인상을 남깁니다.";
+  if (payload.topic === "love" || payload.topic === "match") return "카톡 답장이 늦어도 바로 결론 내리지 말고, 상대의 반복되는 태도를 함께 보세요.";
+  return "짧은 메시지, 약속 시간, 메모장에 남긴 할 일처럼 작은 장면에서 오늘의 흐름이 먼저 보입니다.";
+}
+
+function fallbackBasis(result, payload) {
+  if (Array.isArray(result.basis) && result.basis.length) return result.basis;
+  const topicBasis = payload.topic === "match"
+    ? "두 사람의 오행 리듬을 같이 보면, 같은 점보다 서로 보완되는 지점이 관계의 힘이 됩니다."
+    : "입력한 생년월일과 시간의 오행 리듬을 보면, 오늘은 빠르게 밀기보다 균형을 잡는 쪽이 편합니다.";
+  return [
+    topicBasis,
+    "일간은 내가 세상을 대하는 기본 결로 보는데, 오늘은 그 결을 억지로 바꾸기보다 쓰기 좋은 방향을 찾는 흐름입니다.",
+    "십신은 관계와 역할의 힌트로 읽습니다. 그래서 결과도 사건 예언보다 말투, 타이밍, 행동 기준으로 풀었습니다."
+  ];
 }
 
 function normalizeResult(result, payload) {
@@ -186,11 +233,14 @@ function normalizeResult(result, payload) {
     createdAt: new Date().toISOString(),
     topic: result.topic || topicLabels[payload.topic] || "오늘운세",
     title: result.title || "너굴이가 본 오늘의 흐름",
+    oneLiner: fallbackOneLiner(result, payload),
     summary: result.summary || "오늘은 작은 정리와 신중한 선택이 잘 맞습니다.",
+    scene: fallbackScene(result, payload),
     scores: result.scores || { love: 60, money: 60, career: 60 },
     good: Array.isArray(result.good) ? result.good : [],
     caution: Array.isArray(result.caution) ? result.caution : [],
     actions: Array.isArray(result.actions) ? result.actions : [],
+    basis: fallbackBasis(result, payload),
     request: payload,
     source: result.source || "api"
   };
@@ -209,7 +259,9 @@ function renderResult(result) {
   latestResult = result;
   document.querySelector("#result-topic").textContent = result.topic;
   document.querySelector("#result-title").textContent = result.title;
+  document.querySelector("#result-one-liner").textContent = result.oneLiner || fallbackOneLiner(result, result.request || {});
   document.querySelector("#result-summary").textContent = result.summary;
+  document.querySelector("#result-scene").textContent = result.scene || fallbackScene(result, result.request || {});
 
   const scoreGrid = document.querySelector("#score-grid");
   scoreGrid.innerHTML = "";
@@ -228,6 +280,7 @@ function renderResult(result) {
   renderList(document.querySelector("#result-good"), result.good);
   renderList(document.querySelector("#result-caution"), result.caution);
   renderList(document.querySelector("#result-actions"), result.actions);
+  renderList(document.querySelector("#result-basis"), result.basis || fallbackBasis(result, result.request || {}));
 
   go("/result");
 }
@@ -248,11 +301,20 @@ function saveHistory(result) {
 function renderHistory() {
   const rows = readHistory();
   historyList.innerHTML = "";
+  const pattern = document.querySelector("#history-pattern");
+  if (pattern) {
+    pattern.innerHTML = "";
+    if (rows.length >= 2) {
+      const recentTopics = rows.slice(0, 3).map((row) => row.topic).join(" · ");
+      const avgCareer = Math.round(rows.slice(0, 3).reduce((sum, row) => sum + Number(row.scores?.career || 0), 0) / Math.min(rows.length, 3));
+      pattern.innerHTML = `<p class="panel-kicker">최근 흐름</p><strong>${recentTopics}</strong><span>최근 결과는 일과 정리 흐름이 평균 ${avgCareer}점으로 잡힙니다. 같은 패턴이 반복되면 오늘의 행동부터 가볍게 바꿔보세요.</span>`;
+    }
+  }
 
   if (!rows.length) {
     const empty = document.createElement("p");
     empty.className = "empty-state";
-    empty.textContent = "아직 저장된 운세가 없습니다. 맞춤 운세를 한 번 확인해보세요.";
+    empty.textContent = "아직 보관된 흐름이 없습니다. 내 운세를 한 번 보면 이곳에 차곡차곡 쌓입니다.";
     historyList.append(empty);
     return;
   }
@@ -269,6 +331,14 @@ function renderHistory() {
 
 async function handleSubmit(event) {
   event.preventDefault();
+  if (fortuneRequestPending) return;
+  fortuneRequestPending = true;
+  const submitButton = sajuForm?.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.dataset.idleText = submitButton.textContent;
+    submitButton.textContent = "너굴이가 보는 중";
+    submitButton.disabled = true;
+  }
   const payload = collectFormData();
 
   showScreen("loading");
@@ -287,6 +357,12 @@ async function handleSubmit(event) {
     result.title = "너굴이가 먼저 본 미리보기 운세입니다";
     saveHistory(result);
     renderResult(result);
+  }
+
+  fortuneRequestPending = false;
+  if (submitButton) {
+    submitButton.textContent = submitButton.dataset.idleText || "너굴이에게 물어보기";
+    submitButton.disabled = false;
   }
 }
 

@@ -1,5 +1,5 @@
 /* =========================================================================
- * room.js — 궁합 방: 생성/참여/대시보드, 결정론적 궁합 점수, 공유, 폴링
+ * room.js — 궁합 방: 만들기/참여/대시보드, 결정론적 궁합 점수, 공유, 폴링
  * 마지막에 해시 라우터를 초기화한다(모든 파일 로드 이후).
  * ========================================================================= */
 
@@ -12,7 +12,15 @@ const roomDashboard = document.querySelector("#room-dashboard");
 const roomCountEl = document.querySelector("#room-count");
 const roomPairCountEl = document.querySelector("#room-pair-count");
 const roomPeopleList = document.querySelector("#room-people-list");
+const roomUnlockPanel = document.querySelector("#room-unlock-panel");
+const roomInviteTitle = document.querySelector("#room-invite-title");
+const roomInviteText = document.querySelector("#room-invite-text");
+const roomTopBlock = document.querySelector("#room-top-block");
 const roomTopList = document.querySelector("#room-top-list");
+const roomSurpriseBlock = document.querySelector("#room-surprise-block");
+const roomSurpriseMatch = document.querySelector("#room-surprise-match");
+const roomVibeBlock = document.querySelector("#room-vibe-block");
+const roomVibe = document.querySelector("#room-vibe");
 const roomMineBlock = document.querySelector("#room-mine-block");
 const roomMyMatch = document.querySelector("#room-my-match");
 const roomLinkInput = document.querySelector("#room-link-input");
@@ -22,13 +30,24 @@ const refreshRoomButtons = document.querySelectorAll(".js-refresh-room");
 const copyRoomLinkButtons = document.querySelectorAll(".js-copy-room-link");
 
 let currentRoomId = null;
+let currentRoomSnapshot = null;
 let roomPollTimer = null;
+let roomCreatePending = false;
+let roomJoinPending = false;
 
 const genderLabels = { female: "여성", male: "남성", unspecified: "" };
 const roomDemoKey = "neogul-demo-rooms";
 
 function setRoomStatus(message) {
   if (roomStatusEl) roomStatusEl.textContent = message || "";
+}
+
+function setButtonGroupPending(buttons, pending, pendingText) {
+  buttons.forEach((button) => {
+    if (!button.dataset.idleText) button.dataset.idleText = button.textContent;
+    button.disabled = pending;
+    button.textContent = pending ? pendingText : button.dataset.idleText;
+  });
 }
 
 function myIdKey(roomId) {
@@ -55,7 +74,7 @@ function chemistry(a, b) {
   else if (score >= 80) label = "찰떡 케미";
   else if (score >= 70) label = "꽤 잘 맞음";
   else if (score >= 60) label = "노력하면 굿";
-  return { score, label };
+  return { score, label, relationName: relationNameFor(score, key), key };
 }
 
 function pairCount(total) {
@@ -68,6 +87,116 @@ function chemistryComment(score) {
   if (score >= 70) return "서로 다른 점을 인정하면 안정적으로 맞아요.";
   if (score >= 60) return "조금만 배려하면 편해지는 관계예요.";
   return "속도를 맞추는 연습이 필요한 조합이에요.";
+}
+
+const personaLabels = [
+  "단톡방의 조용한 균형형",
+  "답장은 느리지만 약속은 지키는 안정형",
+  "분위기 올리고 나중에 후회하는 불기운형",
+  "돈 얘기 나오면 현실적인 지갑수문장형",
+  "말보다 표정이 먼저 들키는 솔직형",
+  "계획은 느슨해도 마감은 지키는 뒷심형",
+  "사람 사이 온도를 맞추는 중재형",
+  "갑자기 추진 버튼이 눌리는 직진형"
+];
+
+function personaLabel(person) {
+  const key = `${person.birthDate || ""}@${person.birthTime || "unknown"}@${person.gender || "unspecified"}`;
+  return personaLabels[hashString(key) % personaLabels.length];
+}
+
+function relationNameFor(score, key) {
+  const high = [
+    "말 안 해도 리듬이 붙는 조합",
+    "서로의 빈칸을 자연스럽게 채우는 조합",
+    "만나면 속도가 맞춰지는 찰떡 조합"
+  ];
+  const mid = [
+    "속도는 다르지만 오래 가는 조합",
+    "서로 읽씹해도 이상하게 편한 조합",
+    "회의실에서는 상극, 놀 때는 찰떡인 조합"
+  ];
+  const low = [
+    "조심하면 더 좋아지는 조합",
+    "타이밍만 맞추면 풀리는 조합",
+    "말투를 다듬으면 가까워지는 조합"
+  ];
+  const pool = score >= 82 ? high : score >= 65 ? mid : low;
+  return pool[hashString(key) % pool.length];
+}
+
+function roomInviteCopy(count, me) {
+  const label = me ? personaLabel(me) : "";
+  if (count <= 1) {
+    return {
+      title: "친구가 들어와야 궁합판이 완성돼요",
+      text: label ? `나는 ${label}. 친구가 들어오면 베스트 궁합이 바로 열려요.` : "로그인 없이 닉네임과 생년월일만 넣으면 참여할 수 있어요.",
+      shareTitle: "우리 단톡방 궁합판 열림",
+      shareDescription: label
+        ? `나는 ${label} 나왔어. 너 들어오면 나랑 몇 점인지 바로 열림.`
+        : "닉네임이랑 생년월일만 넣으면 나랑 몇 점인지 바로 나와요."
+    };
+  }
+  if (count < 3) {
+    return {
+      title: "1명만 더 들어오면 TOP3가 열려요",
+      text: "지금은 나와 제일 잘 맞는 사람까지 공개됐어요. 한 명 더 들어오면 단톡방 순위가 바뀔 수 있어요.",
+      shareTitle: "1명만 더 들어오면 TOP 궁합 공개",
+      shareDescription: "지금 2명 참여함. 너 들어오면 순위 뒤집힐 수도 있음."
+    };
+  }
+  if (count < 5) {
+    return {
+      title: `${5 - count}명 더 들어오면 의외의 케미가 열려요`,
+      text: "TOP3는 열렸고, 친구가 더 들어오면 예상 밖으로 잘 맞는 조합까지 보여줘요.",
+      shareTitle: "우리 방 TOP 궁합 나옴",
+      shareDescription: `${count}명 참여 중. 너 들어오면 의외의 케미까지 열릴 수 있어.`
+    };
+  }
+  if (count < 7) {
+    return {
+      title: `${7 - count}명 더 들어오면 오늘의 단톡방 운세가 열려요`,
+      text: "의외의 케미까지 열렸어요. 조금만 더 모이면 이 방 전체 분위기도 읽어줍니다.",
+      shareTitle: "우리 단톡방 의외의 케미 열림",
+      shareDescription: `${count}명 참여 중. 이제 단톡방 운세만 남았어.`
+    };
+  }
+  return {
+    title: "궁합판이 다 열렸어요",
+    text: "TOP 궁합, 의외의 케미, 오늘의 단톡방 운세까지 모두 확인할 수 있어요.",
+    shareTitle: "우리 단톡방 궁합판 다 열림",
+    shareDescription: "TOP 궁합부터 의외의 케미까지 다 나왔어. 너랑 나 조합도 확인해봐."
+  };
+}
+
+function renderUnlockPanel(count) {
+  if (!roomUnlockPanel) return;
+  const milestones = [
+    [1, "궁합판 준비"],
+    [2, "내 베스트 공개"],
+    [3, "TOP3 공개"],
+    [5, "의외의 케미"],
+    [7, "단톡방 운세"]
+  ];
+  roomUnlockPanel.innerHTML = "";
+  milestones.forEach(([needed, label]) => {
+    const item = document.createElement("span");
+    item.className = count >= needed ? "unlock-step is-open" : "unlock-step";
+    item.innerHTML = `<strong>${needed}</strong>${label}`;
+    roomUnlockPanel.append(item);
+  });
+}
+
+function roomVibeText(room, pairs) {
+  const count = room.participants.length;
+  const best = pairs[0];
+  if (!best) return "아직은 친구가 더 들어와야 이 방의 분위기를 읽을 수 있어요.";
+  const labels = room.participants.map((person) => personaLabel(person));
+  const hasDrive = labels.some((label) => label.includes("직진") || label.includes("불기운"));
+  const hasBalance = labels.some((label) => label.includes("균형") || label.includes("중재"));
+  if (count >= 7 && hasDrive && hasBalance) return "이 방은 먼저 치고 나가는 사람과 정리해주는 사람이 같이 있어야 잘 굴러가는 흐름이에요.";
+  if (count >= 7 && best.score >= 85) return "오늘 이 방은 말이 붙으면 금방 분위기가 올라옵니다. 단, 약속 시간과 비용 얘기는 먼저 정리하는 게 좋아요.";
+  return "오늘 이 방은 농담으로 시작해도 결국 현실적인 얘기로 돌아오는 흐름이에요. 답장 속도보다 말의 타이밍을 보세요.";
 }
 
 // 공유/초대 링크는 해시 라우트(#/room/<id>) 형태로 만든다.
@@ -114,7 +243,7 @@ const roomApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "create", title, host })
     });
-    if (!res.ok) throw new Error("방 생성 실패");
+    if (!res.ok) throw new Error("방 만들기 실패");
     return res.json();
   },
   async get(id) {
@@ -149,6 +278,7 @@ const roomApi = {
 
 function renderRoom(room) {
   currentRoomId = room.id;
+  currentRoomSnapshot = room;
   roomTitleEl.textContent = room.title || "궁합 방";
   roomCountEl.textContent = String(room.participants.length);
   if (roomPairCountEl) roomPairCountEl.textContent = String(pairCount(room.participants.length));
@@ -156,6 +286,11 @@ function renderRoom(room) {
 
   const myId = localStorage.getItem(myIdKey(room.id));
   const joined = room.participants.some((person) => person.id === myId);
+  const me = room.participants.find((person) => person.id === myId);
+  const inviteCopy = roomInviteCopy(room.participants.length, me);
+  if (roomInviteTitle) roomInviteTitle.textContent = inviteCopy.title;
+  if (roomInviteText) roomInviteText.textContent = inviteCopy.text;
+  renderUnlockPanel(room.participants.length);
 
   // 참여자 칩
   roomPeopleList.innerHTML = "";
@@ -163,7 +298,11 @@ function renderRoom(room) {
     const li = document.createElement("li");
     li.className = "people-chip";
     if (person.id === myId) li.classList.add("is-me");
-    li.textContent = person.nickname || "익명";
+    const name = document.createElement("strong");
+    name.textContent = person.nickname || "익명";
+    const label = document.createElement("small");
+    label.textContent = personaLabel(person);
+    li.append(name, label);
     roomPeopleList.append(li);
   });
 
@@ -188,10 +327,12 @@ function renderRoom(room) {
   pairs.sort((x, y) => y.score - x.score);
 
   roomTopList.innerHTML = "";
-  if (!pairs.length) {
+  if (room.participants.length < 3) {
     const li = document.createElement("li");
     li.className = "empty-state";
-    li.textContent = "아직 친구가 더 들어와야 궁합을 볼 수 있어요. 링크를 공유해보세요!";
+    li.textContent = room.participants.length < 2
+      ? "아직 친구가 더 들어와야 궁합을 볼 수 있어요. 링크를 공유해보세요!"
+      : "나와 제일 잘 맞는 사람은 열렸어요. 한 명 더 들어오면 단톡방 TOP3가 공개됩니다.";
     roomTopList.append(li);
   } else {
     pairs.slice(0, 5).forEach((pair, index) => {
@@ -213,7 +354,10 @@ function renderRoom(room) {
       pairText.append(cross, document.createTextNode(pair.b.nickname || "익명"));
 
       const comment = document.createElement("small");
-      comment.textContent = chemistryComment(pair.score);
+      comment.textContent = pair.relationName;
+
+      const subComment = document.createElement("small");
+      subComment.textContent = chemistryComment(pair.score);
 
       const score = document.createElement("span");
       score.className = "match-score";
@@ -223,14 +367,39 @@ function renderRoom(room) {
       scoreLabel.textContent = pair.label;
       score.append(scoreNumber, scoreLabel);
 
-      main.append(badge, pairText, comment);
+      main.append(badge, pairText, comment, subComment);
       li.append(main, score);
       roomTopList.append(li);
     });
   }
 
+  if (room.participants.length >= 5 && pairs.length) {
+    showElement(roomSurpriseBlock);
+    const surprise = pairs
+      .filter((pair) => pair.score >= 60 && pair.score < 82)
+      .sort((a, b) => Math.abs(72 - a.score) - Math.abs(72 - b.score))[0] || pairs[Math.min(1, pairs.length - 1)];
+    roomSurpriseMatch.innerHTML = "";
+    const title = document.createElement("strong");
+    title.textContent = surprise.relationName;
+    const detail = document.createElement("span");
+    detail.textContent = `${surprise.a.nickname || "익명"} × ${surprise.b.nickname || "익명"} · ${surprise.score}점`;
+    const comment = document.createElement("small");
+    comment.textContent = "점수보다 말이 생기는 조합이에요. 서로 다른 리듬을 맞추면 꽤 편해집니다.";
+    roomSurpriseMatch.append(title, detail, comment);
+  } else {
+    showElement(roomSurpriseBlock);
+    roomSurpriseMatch.innerHTML = `<span class="empty-state">${Math.max(0, 5 - room.participants.length)}명 더 들어오면 의외의 케미가 열려요.</span>`;
+  }
+
+  if (room.participants.length >= 7) {
+    showElement(roomVibeBlock);
+    roomVibe.textContent = roomVibeText(room, pairs);
+  } else {
+    showElement(roomVibeBlock);
+    roomVibe.textContent = `${Math.max(0, 7 - room.participants.length)}명 더 들어오면 오늘의 단톡방 운세가 열려요.`;
+  }
+
   // 나의 베스트 매치
-  const me = room.participants.find((person) => person.id === myId);
   const others = room.participants.filter((person) => person.id !== myId);
   if (me && others.length) {
     showElement(roomMineBlock);
@@ -241,9 +410,9 @@ function renderRoom(room) {
     const name = document.createElement("strong");
     name.textContent = best.person.nickname || "익명";
     const detail = document.createElement("span");
-    detail.textContent = `${best.score}점 · ${best.label}${genderText}`;
+    detail.textContent = `${best.score}점 · ${best.relationName}${genderText}`;
     const comment = document.createElement("small");
-    comment.textContent = chemistryComment(best.score);
+    comment.textContent = `${personaLabel(best.person)} · ${chemistryComment(best.score)}`;
     roomMyMatch.replaceChildren(name, detail, comment);
   } else {
     hideElement(roomMineBlock);
@@ -319,6 +488,9 @@ async function enterRoom(roomId) {
 }
 
 async function handleCreateRoom() {
+  if (roomCreatePending) return;
+  roomCreatePending = true;
+  setButtonGroupPending(createRoomButtons, true, "방 만드는 중");
   try {
     const host = latestResult?.request ? {
       nickname: latestResult.request.nickname || "익명",
@@ -334,12 +506,23 @@ async function handleCreateRoom() {
     go(`/room/${room.id}`);
   } catch {
     toast("방을 만들지 못했어요. 잠시 후 다시 시도해 주세요.");
+  } finally {
+    roomCreatePending = false;
+    setButtonGroupPending(createRoomButtons, false, "방 만드는 중");
   }
 }
 
 async function handleRoomJoin(event) {
   event.preventDefault();
   if (!currentRoomId) return;
+  if (roomJoinPending) return;
+  roomJoinPending = true;
+  const submitButton = roomJoinForm?.querySelector('button[type="submit"]');
+  if (submitButton) {
+    if (!submitButton.dataset.idleText) submitButton.dataset.idleText = submitButton.textContent;
+    submitButton.textContent = "참여하는 중";
+    submitButton.disabled = true;
+  }
   const data = new FormData(roomJoinForm);
   const participant = {
     nickname: String(data.get("nickname") || "익명").trim() || "익명",
@@ -356,12 +539,22 @@ async function handleRoomJoin(event) {
     startRoomPolling();
   } catch {
     setRoomStatus("참여에 실패했어요. 잠시 후 다시 시도해 주세요.");
+  } finally {
+    roomJoinPending = false;
+    if (submitButton) {
+      submitButton.textContent = submitButton.dataset.idleText || "내 궁합 확인하고 참여하기";
+      submitButton.disabled = false;
+    }
   }
 }
 
 function shareRoom() {
   if (!currentRoomId) return;
   const link = roomShareUrl(currentRoomId);
+  const count = Number(roomCountEl?.textContent || 0);
+  const myId = localStorage.getItem(myIdKey(currentRoomId));
+  const me = currentRoomSnapshot?.participants?.find((person) => person.id === myId) || null;
+  const copy = roomInviteCopy(count, me);
 
   if (initKakao()) {
     const imageUrl = new URL(kakaoConfig.shareImage || "assets/og-image.png", window.location.href).href;
@@ -369,8 +562,8 @@ function shareRoom() {
       window.Kakao.Share.sendDefault({
         objectType: "feed",
         content: {
-          title: "우리 단톡방 궁합 순위 열림",
-          description: "들어와서 생년월일 넣으면 TOP 궁합이 바로 바뀌어요. 너랑 나 몇 점인지 확인해봐요.",
+          title: copy.shareTitle,
+          description: `${copy.shareDescription} 로그인 없이 닉네임과 생년월일만 넣으면 돼요.`,
           imageUrl,
           link: { mobileWebUrl: link, webUrl: link }
         },
