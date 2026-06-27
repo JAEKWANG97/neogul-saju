@@ -313,6 +313,10 @@ button {
   gap: 16px;
 }
 
+.section-head > div {
+  min-width: 0;
+}
+
 .rank-section h2,
 .quick-form h2 {
   font-size: 20px;
@@ -993,6 +997,11 @@ button {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
+}
+
+.head-actions .text-button {
+  white-space: nowrap;
 }
 
 /* 결과 화면 상단 — 자신만만 너굴맨 (짜잔) */

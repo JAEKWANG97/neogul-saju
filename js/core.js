@@ -194,8 +194,8 @@ scrollTopButtons.forEach((button) => {
   button.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 });
 
-// 카카오 키가 없으면 로그인은 동작할 수 없으니 버튼 자체를 숨긴다 (죽은 버튼 방지)
-if (!kakaoConfig.kakaoJavaScriptKey) {
+// 카카오 로그인 백엔드가 준비되기 전에는 버튼 자체를 숨긴다 (죽은 버튼 방지)
+if (!kakaoConfig.kakaoJavaScriptKey || !kakaoConfig.enableKakaoLogin) {
   loginButtons.forEach((button) => button.classList.add("is-hidden"));
 } else {
   loginButtons.forEach((button) => button.addEventListener("click", startKakaoLogin));

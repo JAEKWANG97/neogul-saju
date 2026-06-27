@@ -1,6 +1,7 @@
 window.NEOGUL_SAJU_CONFIG = {
   // 카카오 개발자센터 JavaScript 키 (공유/로그인용, 프론트 공개 키)
   kakaoJavaScriptKey: "a9be59f444936594e818e60b2cc0c7ae",
+  enableKakaoLogin: false,
   kakaoRedirectUri: "https://neogul-saju.vercel.app/",
   shareUrl: "https://neogul-saju.vercel.app/",
   shareImage: "https://neogul-saju.vercel.app/assets/og-image.png",

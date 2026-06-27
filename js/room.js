@@ -97,10 +97,13 @@ const roomApi = {
   demoSave(map) {
     localStorage.setItem(roomDemoKey, JSON.stringify(map));
   },
-  async create(title) {
+  async create(title, host) {
     if (this.isDemo()) {
       const id = Math.random().toString(36).slice(2, 8);
       const room = { id, title: title || "궁합 방", createdAt: new Date().toISOString(), participants: [] };
+      if (host) {
+        room.participants.push({ id: crypto.randomUUID?.() || String(Date.now()), joinedAt: new Date().toISOString(), ...host });
+      }
       const map = this.demoAll();
       map[id] = room;
       this.demoSave(map);
@@ -109,7 +112,7 @@ const roomApi = {
     const res = await fetch(this.base(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "create", title })
+      body: JSON.stringify({ action: "create", title, host })
     });
     if (!res.ok) throw new Error("방 생성 실패");
     return res.json();
@@ -317,7 +320,17 @@ async function enterRoom(roomId) {
 
 async function handleCreateRoom() {
   try {
-    const room = await roomApi.create("궁합 방");
+    const host = latestResult?.request ? {
+      nickname: latestResult.request.nickname || "익명",
+      birthDate: latestResult.request.birthDate,
+      birthTime: latestResult.request.birthTime,
+      calendarType: latestResult.request.calendarType,
+      gender: latestResult.request.gender
+    } : null;
+    const room = await roomApi.create("궁합 방", host);
+    if (host && room.participants?.[0]?.id) {
+      localStorage.setItem(myIdKey(room.id), room.participants[0].id);
+    }
     go(`/room/${room.id}`);
   } catch {
     toast("방을 만들지 못했어요. 잠시 후 다시 시도해 주세요.");
