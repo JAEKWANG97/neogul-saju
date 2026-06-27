@@ -699,6 +699,12 @@ button {
 
 /* ---------------------------- 궁합 방 (공유 참여) ---------------------------- */
 
+.room-page {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
 .room-status {
   margin: 0 0 6px;
   color: var(--coral);
@@ -710,10 +716,139 @@ button {
   display: none;
 }
 
+.room-hero-card,
+.room-join,
+.room-dashboard .result-block,
+.room-people {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 250, 242, 0.88);
+  box-shadow: 0 10px 28px rgba(67, 45, 23, 0.09);
+}
+
+.room-hero-card {
+  display: grid;
+  grid-template-columns: 1fr 92px;
+  align-items: end;
+  gap: 10px;
+  padding: 18px 16px 0 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(140deg, rgba(255, 250, 242, 0.96), rgba(240, 247, 252, 0.9)),
+    repeating-linear-gradient(120deg, rgba(212, 155, 56, 0.08) 0 1px, transparent 1px 13px);
+}
+
+.room-hero-card h3 {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.room-hero-card p:last-child {
+  margin: 8px 0 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.48;
+}
+
+.room-hero-card img {
+  width: 102px;
+  max-height: 132px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 15px rgba(76, 49, 23, 0.15));
+}
+
+.room-join {
+  padding: 16px;
+}
+
 .room-intro {
   margin: 0 0 12px;
   color: var(--muted);
   font-size: 14px;
+  line-height: 1.48;
+}
+
+.room-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.room-steps li {
+  display: grid;
+  gap: 6px;
+  min-height: 72px;
+  align-content: center;
+  justify-items: center;
+  padding: 10px 4px;
+  border: 1px solid rgba(231, 214, 199, 0.84);
+  border-radius: 16px;
+  background: #fffdf8;
+  text-align: center;
+}
+
+.room-steps strong {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--denim-dark);
+  color: #fffaf2;
+  font-size: 13px;
+}
+
+.room-steps span {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.room-dashboard {
+  display: grid;
+  gap: 12px;
+}
+
+.room-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.room-summary div {
+  display: grid;
+  gap: 4px;
+  min-height: 82px;
+  align-content: center;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--denim-dark);
+  color: #fffaf2;
+  box-shadow: 0 10px 22px rgba(32, 63, 98, 0.18);
+}
+
+.room-summary div:nth-child(2) {
+  background: #8a5f21;
+}
+
+.room-summary strong {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.room-summary span {
+  font-size: 13px;
+  font-weight: 800;
+  opacity: 0.86;
+}
+
+.room-people {
+  padding: 14px;
 }
 
 .people-chips {
@@ -755,15 +890,34 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
+  min-width: 0;
+  padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 18px;
   background: #fffdf8;
 }
 
+.match-main {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.match-badge {
+  width: max-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #ffead2;
+  color: #9a541d;
+  font-size: 11px;
+  font-weight: 900;
+}
+
 .match-pair {
+  min-width: 0;
   font-weight: 800;
   color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 .match-pair em {
@@ -773,6 +927,7 @@ button {
 }
 
 .match-score {
+  flex: 0 0 58px;
   display: grid;
   justify-items: end;
   line-height: 1.1;
@@ -790,7 +945,7 @@ button {
 
 .my-match {
   display: grid;
-  gap: 4px;
+  gap: 5px;
   padding: 16px;
   border: 1px solid var(--gold);
   border-radius: 18px;
@@ -805,6 +960,13 @@ button {
 .my-match span {
   color: var(--muted);
   font-weight: 700;
+}
+
+.my-match small,
+.match-main small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .room-link-row {
@@ -854,7 +1016,7 @@ button {
 }
 
 .result-room-text {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   font-size: 17px;
   font-weight: 900;
   color: var(--denim-dark);

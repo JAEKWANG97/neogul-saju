@@ -264,9 +264,10 @@
           <ul id="result-actions"></ul>
         </div>
         <div class="result-room-cta">
-          <p class="result-room-text">친구들이랑 같이 볼래?</p>
-          <p class="result-room-sub">궁합 방을 만들어 단톡방에 공유하면 누구와 제일 잘 맞는지 같이 볼 수 있어요.</p>
-          <button class="primary-button js-create-room" type="button">궁합 방 만들기</button>
+          <p class="panel-kicker">단톡방 궁합</p>
+          <p class="result-room-text">친구들이랑 TOP 궁합까지 볼래?</p>
+          <p class="result-room-sub">방을 만들고 링크를 공유하면 참여자끼리 가장 잘 맞는 조합을 바로 볼 수 있어요.</p>
+          <button class="primary-button js-create-room" type="button">내 궁합 방 만들기</button>
         </div>
         <div class="result-actions">
           <button class="secondary-button js-start-reading" type="button">다시 보기</button>
@@ -299,8 +300,22 @@
 
         <p class="room-status" id="room-status"></p>
 
+        <div class="room-hero-card">
+          <div>
+            <p class="panel-kicker">단톡방 궁합판</p>
+            <h3>친구들이 들어올수록 순위가 바뀌어요</h3>
+            <p>내 정보를 넣고 방에 참여하면 TOP 궁합과 나의 베스트 매치를 바로 확인할 수 있어요.</p>
+          </div>
+          <img src="assets/neogulman-curious.png" alt="" loading="lazy">
+        </div>
+
         <div class="room-join is-hidden" id="room-join">
-          <p class="room-intro" id="room-join-intro">내 사주를 넣고 방에 참여하면 친구들과의 궁합을 볼 수 있어요.</p>
+          <ol class="room-steps" aria-label="궁합 방 이용 순서">
+            <li><strong>1</strong><span>내 정보 입력</span></li>
+            <li><strong>2</strong><span>방 참여</span></li>
+            <li><strong>3</strong><span>친구 초대</span></li>
+          </ol>
+          <p class="room-intro" id="room-join-intro">닉네임과 생년월일만 넣으면 방 안의 친구들과 궁합 순위를 볼 수 있어요.</p>
           <form class="fortune-form" id="room-join-form">
             <label>
               닉네임
@@ -345,13 +360,24 @@
                 <option value="亥">해시 21:00-22:59</option>
               </select>
             </label>
-            <button class="secondary-button" type="submit">방에 참여하기</button>
+            <button class="secondary-button" type="submit">내 궁합 확인하고 참여하기</button>
           </form>
         </div>
 
         <div class="room-dashboard is-hidden" id="room-dashboard">
+          <div class="room-summary">
+            <div>
+              <strong id="room-count">0</strong>
+              <span>참여자</span>
+            </div>
+            <div>
+              <strong id="room-pair-count">0</strong>
+              <span>궁합 조합</span>
+            </div>
+          </div>
+
           <div class="room-people">
-            <p class="panel-kicker">참여자 <span id="room-count">0</span>명</p>
+            <p class="panel-kicker">참여한 친구들</p>
             <ul class="people-chips" id="room-people-list"></ul>
           </div>
 
@@ -366,7 +392,7 @@
           </div>
 
           <div class="result-actions">
-            <button class="secondary-button js-share-room" type="button">카카오톡으로 친구 더 부르기</button>
+            <button class="secondary-button js-share-room" type="button">친구 초대하기</button>
             <button class="ghost-button js-refresh-room" type="button">새로고침</button>
           </div>
           <p class="room-link-row">

@@ -10,6 +10,7 @@ const roomJoin = document.querySelector("#room-join");
 const roomJoinForm = document.querySelector("#room-join-form");
 const roomDashboard = document.querySelector("#room-dashboard");
 const roomCountEl = document.querySelector("#room-count");
+const roomPairCountEl = document.querySelector("#room-pair-count");
 const roomPeopleList = document.querySelector("#room-people-list");
 const roomTopList = document.querySelector("#room-top-list");
 const roomMineBlock = document.querySelector("#room-mine-block");
@@ -55,6 +56,18 @@ function chemistry(a, b) {
   else if (score >= 70) label = "꽤 잘 맞음";
   else if (score >= 60) label = "노력하면 굿";
   return { score, label };
+}
+
+function pairCount(total) {
+  return total < 2 ? 0 : (total * (total - 1)) / 2;
+}
+
+function chemistryComment(score) {
+  if (score >= 90) return "처음부터 속도가 잘 맞는 조합이에요.";
+  if (score >= 80) return "대화가 붙으면 금방 가까워지는 흐름이에요.";
+  if (score >= 70) return "서로 다른 점을 인정하면 안정적으로 맞아요.";
+  if (score >= 60) return "조금만 배려하면 편해지는 관계예요.";
+  return "속도를 맞추는 연습이 필요한 조합이에요.";
 }
 
 // 공유/초대 링크는 해시 라우트(#/room/<id>) 형태로 만든다.
@@ -135,6 +148,7 @@ function renderRoom(room) {
   currentRoomId = room.id;
   roomTitleEl.textContent = room.title || "궁합 방";
   roomCountEl.textContent = String(room.participants.length);
+  if (roomPairCountEl) roomPairCountEl.textContent = String(pairCount(room.participants.length));
   roomLinkInput.value = roomShareUrl(room.id);
 
   const myId = localStorage.getItem(myIdKey(room.id));
@@ -177,11 +191,37 @@ function renderRoom(room) {
     li.textContent = "아직 친구가 더 들어와야 궁합을 볼 수 있어요. 링크를 공유해보세요!";
     roomTopList.append(li);
   } else {
-    pairs.slice(0, 5).forEach((pair) => {
+    pairs.slice(0, 5).forEach((pair, index) => {
       const li = document.createElement("li");
       li.className = "match-row";
-      li.innerHTML = `<span class="match-pair">${pair.a.nickname} <em>×</em> ${pair.b.nickname}</span>`
-        + `<span class="match-score"><strong>${pair.score}</strong><small>${pair.label}</small></span>`;
+
+      const main = document.createElement("span");
+      main.className = "match-main";
+
+      const badge = document.createElement("span");
+      badge.className = "match-badge";
+      badge.textContent = `TOP ${index + 1}`;
+
+      const pairText = document.createElement("span");
+      pairText.className = "match-pair";
+      pairText.append(document.createTextNode(pair.a.nickname || "익명"));
+      const cross = document.createElement("em");
+      cross.textContent = "×";
+      pairText.append(cross, document.createTextNode(pair.b.nickname || "익명"));
+
+      const comment = document.createElement("small");
+      comment.textContent = chemistryComment(pair.score);
+
+      const score = document.createElement("span");
+      score.className = "match-score";
+      const scoreNumber = document.createElement("strong");
+      scoreNumber.textContent = String(pair.score);
+      const scoreLabel = document.createElement("small");
+      scoreLabel.textContent = pair.label;
+      score.append(scoreNumber, scoreLabel);
+
+      main.append(badge, pairText, comment);
+      li.append(main, score);
       roomTopList.append(li);
     });
   }
@@ -195,8 +235,13 @@ function renderRoom(room) {
       .map((person) => ({ person, ...chemistry(me, person) }))
       .sort((x, y) => y.score - x.score)[0];
     const genderText = genderLabels[best.person.gender] ? ` · ${genderLabels[best.person.gender]}` : "";
-    roomMyMatch.innerHTML = `<strong>${best.person.nickname}</strong>`
-      + `<span>${best.score}점 · ${best.label}${genderText}</span>`;
+    const name = document.createElement("strong");
+    name.textContent = best.person.nickname || "익명";
+    const detail = document.createElement("span");
+    detail.textContent = `${best.score}점 · ${best.label}${genderText}`;
+    const comment = document.createElement("small");
+    comment.textContent = chemistryComment(best.score);
+    roomMyMatch.replaceChildren(name, detail, comment);
   } else {
     hideElement(roomMineBlock);
   }
