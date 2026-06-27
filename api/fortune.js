@@ -5,7 +5,7 @@ const { corsHeaders, sendJson, readBody, clientIp } = require("../lib/http");
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const FORTUNE_LIMIT_PER_HOUR = 60; // IP당 시간당 운세 생성 상한
 const MAX_OUTPUT_TOKENS = 1000;    // 출력 토큰 상한 (비용 캡)
-const PROMPT_VERSION = "saju-depth-v2";
+const PROMPT_VERSION = "saju-depth-v3";
 
 const fortuneSchema = {
   type: "object",
@@ -139,6 +139,7 @@ function buildPrompt(body) {
       "",
       "궁합 추가 원칙:",
       "- 두 사람을 승패처럼 비교하지 말고, 기운의 맞물림과 생활 리듬의 차이를 읽는다.",
+      "- 질문에 관계 형태가 명확히 나오지 않으면 연인, 부부, 친구 같은 관계를 단정하지 말고 '두 사람', '상대', '관계'로 표현한다.",
       "- summary에는 두 사람의 끌림, 대화 방식, 안정감 또는 충돌 지점을 모두 담는다.",
       "- scores는 love=끌림, money=대화, career=안정의 의미로 작성한다.",
       "- good에는 서로에게 도움이 되는 지점을 쓴다.",
