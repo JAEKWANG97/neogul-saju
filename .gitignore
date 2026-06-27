@@ -7,3 +7,5 @@ node_modules
 assets/ChatGPT Image*.png
 assets/*-previous.png
 assets/og-image-source.png
+
+assets/*-sheet-crop.png
