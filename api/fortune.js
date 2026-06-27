@@ -1,11 +1,17 @@
 const crypto = require("crypto");
 const { redis, redisConfigured, rateLimit } = require("../lib/redis");
 const { corsHeaders, sendJson, readBody, clientIp } = require("../lib/http");
+const {
+  buildSajuProfile,
+  buildMatchProfile,
+  formatSajuForPrompt,
+  formatMatchForPrompt
+} = require("../lib/saju");
 
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const FORTUNE_LIMIT_PER_HOUR = 60; // IP당 시간당 운세 생성 상한
 const MAX_OUTPUT_TOKENS = 1000;    // 출력 토큰 상한 (비용 캡)
-const PROMPT_VERSION = "saju-depth-v6";
+const PROMPT_VERSION = "saju-origin-v1";
 
 const fortuneSchema = {
   type: "object",
@@ -48,6 +54,7 @@ function secondsUntilKstMidnight() {
 function cacheKeyFor(body) {
   const parts = [
     PROMPT_VERSION,
+    (body.nickname || "").trim(),
     body.topic || "today",
     body.birthDate || "",
     body.birthTime || "",
@@ -57,7 +64,7 @@ function cacheKeyFor(body) {
   ];
   if (body.topic === "match" && body.partner) {
     const p = body.partner;
-    parts.push(p.birthDate || "", p.birthTime || "", p.calendarType || "", p.gender || "");
+    parts.push((p.name || "").trim(), p.birthDate || "", p.birthTime || "", p.calendarType || "", p.gender || "");
   }
   if (body.topic === "today") parts.push(todayKST());
   const hash = crypto.createHash("sha1").update(parts.join("|")).digest("hex").slice(0, 24);
@@ -70,6 +77,9 @@ function cacheTtl(body) {
 
 function buildPrompt(body) {
   const topic = body.topic || "today";
+  const sajuProfile = buildSajuProfile(body);
+  const partnerSajuProfile = topic === "match" && body.partner ? buildSajuProfile(body.partner) : null;
+  const matchProfile = topic === "match" ? buildMatchProfile(sajuProfile, partnerSajuProfile) : null;
   const topicGuide = {
     today: [
       "오늘운세는 하루의 리듬, 사람을 대하는 태도, 결정의 속도, 정리해야 할 일을 중심으로 쓴다.",
@@ -102,10 +112,15 @@ function buildPrompt(body) {
     "사용자의 생년월일, 태어난 시간, 양/음력, 성별, 질문을 바탕으로 사주적 흐름을 깊이 있게 풀어낸다.",
     "문체는 고급스럽고 차분하되 읽는 재미가 있어야 한다. 과하게 신비화하지 말고, 오래 읽히는 해석문처럼 쓴다.",
     "",
+    "계산된 원국 데이터:",
+    ...formatSajuForPrompt("본인", sajuProfile),
+    ...(partnerSajuProfile ? formatSajuForPrompt("상대", partnerSajuProfile) : []),
+    ...(matchProfile ? formatMatchForPrompt(matchProfile) : []),
+    "",
     "해석 원칙:",
-    "- 오행, 음양, 계절감, 기운의 강약, 관계의 상생/상극이라는 관점을 활용한다.",
-    "- 정확한 사주 원국 계산 결과가 별도로 제공되지 않았으므로 특정 일주, 월주, 십성, 대운을 단정하지 않는다.",
-    "- 대신 입력된 생년월일과 시간대에서 읽을 수 있는 리듬, 기질, 흐름의 방향을 사주 언어로 자연스럽게 설명한다.",
+    "- 위의 원국 계산 결과를 우선 근거로 삼아 오행, 음양, 계절감, 기운의 강약, 관계의 상생/상극을 해석한다.",
+    "- 원국 데이터에 있는 일간, 사주 네 기둥, 십신, 오행 분포는 자연스럽게 반영하되 사용자가 이해하기 쉽게 풀어 쓴다.",
+    "- 원국 데이터에 없는 대운, 세운, 세부 합충형해를 새로 지어내거나 단정하지 않는다.",
     "- 子, 丑, 寅, 午 같은 지지 한자를 사용자에게 그대로 노출하지 말고 '낮의 불기운', '새벽의 차분한 기운'처럼 풀어서 쓴다.",
     "- '반드시', '무조건', '큰일 난다' 같은 공포 조장이나 확정 예언을 피한다.",
     "- 의학, 법률, 투자 확정 조언은 하지 않는다.",

@@ -5,5 +5,8 @@
   "description": "너굴 사주 모바일 웹 (정적 프론트 + Vercel 서버리스 백엔드)",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "lunar-javascript": "^1.7.7"
   }
 }
