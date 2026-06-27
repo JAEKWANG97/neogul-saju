@@ -5,34 +5,22 @@
 
 const topics = {
   today: {
-    kicker: "오늘운세",
-    title: "오늘의 기운은 차분한 정리운입니다",
-    copy: "미뤄둔 연락, 정산, 일정 정리에 유리합니다. 큰 결정보다는 작게 정리하는 선택이 더 좋습니다."
+    kicker: "오늘운세"
   },
   love: {
-    kicker: "애정운",
-    title: "표현은 짧게, 마음은 분명하게",
-    copy: "상대의 반응을 오래 재기보다 먼저 가볍게 말을 건네면 관계의 온도가 올라갑니다."
+    kicker: "애정운"
   },
   money: {
-    kicker: "재물운",
-    title: "작은 지출을 잡으면 흐름이 좋아집니다",
-    copy: "오늘은 큰 투자보다 구독, 자동결제, 반복 지출을 점검하는 쪽이 더 실속 있습니다."
+    kicker: "재물운"
   },
   career: {
-    kicker: "직장운",
-    title: "정리된 문서가 기회를 만듭니다",
-    copy: "아이디어보다 실행 기록이 돋보이는 날입니다. 회의 전 핵심 내용을 짧게 정리해두세요."
+    kicker: "직장운"
   },
   match: {
-    kicker: "궁합",
-    title: "비슷함보다 보완되는 부분을 보세요",
-    copy: "서로 다른 생활 리듬이 단점처럼 보여도, 역할이 나뉘면 안정적인 궁합이 됩니다."
+    kicker: "궁합"
   },
   year: {
-    kicker: "신년운세",
-    title: "올해는 기반을 고르는 운입니다",
-    copy: "새 출발보다 오래 끌고 갈 루틴을 만드는 데 초점을 두면 하반기 흐름이 단단해집니다."
+    kicker: "신년운세"
   }
 };
 
@@ -47,8 +35,6 @@ const topicLabels = {
 
 const cards = document.querySelectorAll(".fortune-card");
 const kicker = document.querySelector("#topic-kicker");
-const title = document.querySelector("#topic-title");
-const copy = document.querySelector("#topic-copy");
 const startButtons = document.querySelectorAll(".js-start-reading");
 const historyButtons = document.querySelectorAll(".js-show-history");
 const clearHistoryButton = document.querySelector(".js-clear-history");
@@ -67,16 +53,14 @@ function togglePartnerFields(topic) {
   if (partnerBirthDate) partnerBirthDate.required = isMatch;
 }
 
-// 주제 선택의 단일 소스: 카드 강조 / 미리보기 패널 / 폼 select / 상대방칸을 한 번에 동기화
+// 주제 선택의 단일 소스: 카드 강조 / 폼 select / 상대방칸을 한 번에 동기화
 function applyTopic(topicKey) {
   const topic = topics[topicKey];
   if (!topic) return;
 
   selectedTopic = topicKey;
   cards.forEach((item) => item.classList.toggle("active", item.dataset.topic === topicKey));
-  kicker.textContent = topic.kicker;
-  title.textContent = topic.title;
-  copy.textContent = topic.copy;
+  if (kicker) kicker.textContent = topic.kicker;
 
   const topicSelect = sajuForm?.elements.topic;
   if (topicSelect && topicSelect.value !== topicKey) topicSelect.value = topicKey;
@@ -96,7 +80,7 @@ cards.forEach((card) => {
   });
 });
 
-// 폼 안 select 변경도 미리보기·카드 강조까지 같이 동기화
+// 폼 안 select 변경도 카드 강조와 같이 동기화
 sajuForm?.elements.topic?.addEventListener("change", (event) => applyTopic(event.target.value));
 
 function collectFormData() {
@@ -179,7 +163,7 @@ function createDemoFortune(payload) {
     summary: `오늘은 크게 밀어붙이기보다 정리, 관찰, 짧은 실행이 잘 맞습니다.${question}`,
     scores: { love: 72, money: 64, career: 78 },
     good: [
-      "오전에 미뤄둔 연락을 정리하면 오후 흐름이 가벼워집니다.",
+      "오전에 짧게 처리할 일을 끝내면 오후 흐름이 가벼워집니다.",
       "새 선택보다 기존 계획을 다듬는 일이 좋은 결과로 이어집니다.",
       "상대의 말보다 반복되는 행동을 보면 판단이 쉬워집니다."
     ],
@@ -306,7 +290,7 @@ async function handleSubmit(event) {
   }
 }
 
-// "무료로 보기" / "다시 보기" → 홈으로 가서 입력 폼으로 스크롤
+// 시작 버튼 / 다시 보기 → 홈으로 가서 입력 폼으로 스크롤
 startButtons.forEach((button) => {
   button.addEventListener("click", () => {
     pendingFormScroll = true;

@@ -166,7 +166,6 @@ button {
 }
 
 .hero h1,
-.panel h2,
 .rank-section h2,
 .quick-form h2 {
   margin: 0;
@@ -276,7 +275,6 @@ button {
   background-image: url("assets/fortune-year.png");
 }
 
-.panel,
 .rank-section,
 .quick-form {
   margin-top: 14px;
@@ -284,33 +282,6 @@ button {
   border-radius: 22px;
   background: rgba(255, 250, 242, 0.82);
   box-shadow: 0 10px 28px rgba(67, 45, 23, 0.09);
-}
-
-.panel {
-  display: grid;
-  grid-template-columns: 76px 1fr;
-  gap: 14px;
-  align-items: center;
-  padding: 18px;
-}
-
-.panel-illust {
-  width: 76px;
-  aspect-ratio: 1;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 12px rgba(76, 49, 23, 0.13));
-}
-
-.panel h2 {
-  font-size: 19px;
-  line-height: 1.28;
-}
-
-.panel p:last-child {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.48;
 }
 
 .primary-button,
@@ -719,15 +690,6 @@ button {
 
   .fortune-card strong {
     font-size: 14px;
-  }
-
-  .panel {
-    grid-template-columns: 1fr;
-  }
-
-  .panel-illust {
-    width: 96px;
-    justify-self: center;
   }
 
   .primary-button {
