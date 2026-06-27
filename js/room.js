@@ -352,18 +352,22 @@ function shareRoom() {
 
   if (initKakao()) {
     const imageUrl = new URL(kakaoConfig.shareImage || "assets/og-image.png", window.location.href).href;
-    window.Kakao.Share.sendDefault({
-      objectType: "feed",
-      content: {
-        title: "너굴 사주 궁합 방에 초대합니다",
-        description: "우리 단톡방 궁합 보러 오세요! 사주를 넣으면 누구랑 제일 잘 맞는지 너굴이가 알려줘요.",
-        imageUrl,
-        link: { mobileWebUrl: link, webUrl: link }
-      },
-      buttons: [
-        { title: "궁합 방 입장", link: { mobileWebUrl: link, webUrl: link } }
-      ]
-    });
+    try {
+      window.Kakao.Share.sendDefault({
+        objectType: "feed",
+        content: {
+          title: "우리 단톡방 궁합 순위 열림",
+          description: "들어와서 생년월일 넣으면 TOP 궁합이 바로 바뀌어요. 너랑 나 몇 점인지 확인해봐요.",
+          imageUrl,
+          link: { mobileWebUrl: link, webUrl: link }
+        },
+        buttons: [
+          { title: "궁합 순위 보러가기", link: { mobileWebUrl: link, webUrl: link } }
+        ]
+      });
+    } catch {
+      copyRoomLink();
+    }
     return;
   }
 

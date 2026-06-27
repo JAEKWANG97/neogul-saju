@@ -154,21 +154,31 @@ function startKakaoShare() {
   }
 
   const imageUrl = new URL(kakaoConfig.shareImage || "assets/og-image.png", window.location.href).href;
-  const titleText = latestResult?.title || "너굴 사주 - 오늘 운세, 너굴이가 봐드림";
-  const description = latestResult?.summary || "수정구슬 앞의 느긋한 점술사 너굴이와 오늘의 사주 흐름을 확인해보세요.";
+  const titleText = latestResult
+    ? `내 너굴 사주: ${latestResult.title}`
+    : "너굴 사주 - 오늘 내 흐름 보기";
+  const summary = latestResult?.summary || "수정구슬 앞의 느긋한 점술사 너굴이와 오늘의 사주 흐름을 확인해보세요.";
+  const description = latestResult
+    ? `${summary.slice(0, 72)}${summary.length > 72 ? "..." : ""} 너도 한번 봐봐.`
+    : summary;
+  const buttonTitle = latestResult ? "내 사주도 보기" : "운세 보러가기";
 
-  window.Kakao.Share.sendDefault({
-    objectType: "feed",
-    content: {
-      title: titleText,
-      description,
-      imageUrl,
-      link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
-    },
-    buttons: [
-      { title: "운세 보러가기", link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }
-    ]
-  });
+  try {
+    window.Kakao.Share.sendDefault({
+      objectType: "feed",
+      content: {
+        title: titleText,
+        description,
+        imageUrl,
+        link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+      },
+      buttons: [
+        { title: buttonTitle, link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }
+      ]
+    });
+  } catch {
+    copyLink(pageUrl, "공유 링크를 복사했어요. 단톡방에 붙여넣어 보세요!");
+  }
 }
 
 /* ----------------------------- 셸 이벤트 배선 ----------------------------- */
