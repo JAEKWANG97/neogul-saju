@@ -1,6 +1,6 @@
 window.NEOGUL_SAJU_CONFIG = {
   // 카카오 개발자센터 JavaScript 키 (공유/로그인용, 프론트 공개 키)
-  kakaoJavaScriptKey: "",
+  kakaoJavaScriptKey: "a9be59f444936594e818e60b2cc0c7ae",
   kakaoRedirectUri: window.location.origin + window.location.pathname,
   shareUrl: window.location.origin + window.location.pathname,
   shareImage: "assets/og-image.png",
