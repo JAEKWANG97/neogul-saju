@@ -1,3 +1,8 @@
+/* =========================================================================
+ * fortune.js — 개인 운세: 주제 선택, 입력 폼, 결과 렌더, 기록(localStorage)
+ * core.js의 showScreen/go/toast/scrollToPanel 등을 전역으로 공유한다.
+ * ========================================================================= */
+
 const topics = {
   today: {
     kicker: "오늘운세",
@@ -44,126 +49,80 @@ const cards = document.querySelectorAll(".fortune-card");
 const kicker = document.querySelector("#topic-kicker");
 const title = document.querySelector("#topic-title");
 const copy = document.querySelector("#topic-copy");
-const loginButtons = document.querySelectorAll(".js-kakao-login");
-const shareButtons = document.querySelectorAll(".js-kakao-share");
 const startButtons = document.querySelectorAll(".js-start-reading");
 const historyButtons = document.querySelectorAll(".js-show-history");
-const scrollTopButtons = document.querySelectorAll(".js-scroll-top");
 const clearHistoryButton = document.querySelector(".js-clear-history");
-const formSection = document.querySelector("#fortune-form");
-const loadingPage = document.querySelector("#loading-page");
-const resultPage = document.querySelector("#result-page");
-const historyPage = document.querySelector("#history-page");
 const sajuForm = document.querySelector("#saju-form");
+const partnerFields = document.querySelector("#partner-fields");
 const historyList = document.querySelector("#history-list");
-const kakaoConfig = window.NEOGUL_SAJU_CONFIG || {};
 const historyKey = "neogul-saju-history";
 
 let selectedTopic = "today";
 let latestResult = null;
 
+function togglePartnerFields(topic) {
+  const isMatch = topic === "match";
+  partnerFields?.classList.toggle("is-hidden", !isMatch);
+  const partnerBirthDate = sajuForm?.elements.partnerBirthDate;
+  if (partnerBirthDate) partnerBirthDate.required = isMatch;
+}
+
+// 주제 선택의 단일 소스: 카드 강조 / 미리보기 패널 / 폼 select / 상대방칸을 한 번에 동기화
+function applyTopic(topicKey) {
+  const topic = topics[topicKey];
+  if (!topic) return;
+
+  selectedTopic = topicKey;
+  cards.forEach((item) => item.classList.toggle("active", item.dataset.topic === topicKey));
+  kicker.textContent = topic.kicker;
+  title.textContent = topic.title;
+  copy.textContent = topic.copy;
+
+  const topicSelect = sajuForm?.elements.topic;
+  if (topicSelect && topicSelect.value !== topicKey) topicSelect.value = topicKey;
+  togglePartnerFields(topicKey);
+}
+
+function revealForm() {
+  formSection?.classList.remove("is-hidden");
+}
+
+// 메뉴 카드 탭 → 주제 동기화 + 폼 펼치기(단계화) + 폼으로 스크롤
 cards.forEach((card) => {
   card.addEventListener("click", () => {
-    const topic = topics[card.dataset.topic];
-    if (!topic) return;
-
-    selectedTopic = card.dataset.topic;
-    cards.forEach((item) => item.classList.remove("active"));
-    card.classList.add("active");
-    kicker.textContent = topic.kicker;
-    title.textContent = topic.title;
-    copy.textContent = topic.copy;
-
-    const topicSelect = sajuForm?.elements.topic;
-    if (topicSelect) topicSelect.value = selectedTopic;
+    applyTopic(card.dataset.topic);
+    revealForm();
+    scrollToPanel(formSection);
   });
 });
 
-function setLoginStatus(message) {
-  console.info(message);
-}
-
-function initKakao() {
-  if (!window.Kakao) {
-    setLoginStatus("카카오 SDK를 불러오지 못했습니다. 네트워크 연결을 확인해 주세요.");
-    return false;
-  }
-
-  if (!kakaoConfig.kakaoJavaScriptKey) {
-    setLoginStatus("Kakao JavaScript key is not configured.");
-    return false;
-  }
-
-  if (!window.Kakao.isInitialized()) {
-    window.Kakao.init(kakaoConfig.kakaoJavaScriptKey);
-  }
-
-  setLoginStatus("카카오톡으로 로그인하면 운세 결과를 이어서 볼 수 있습니다.");
-  return true;
-}
-
-function startKakaoLogin() {
-  if (!initKakao()) return;
-
-  window.Kakao.Auth.authorize({
-    redirectUri: kakaoConfig.kakaoRedirectUri
-  });
-}
-
-function startKakaoShare() {
-  if (!initKakao()) return;
-
-  const pageUrl = kakaoConfig.shareUrl || window.location.href;
-  const imageUrl = new URL(kakaoConfig.shareImage || "assets/og-image.png", window.location.href).href;
-  const titleText = latestResult?.title || "너굴 사주 - 오늘 운세, 너굴이가 봐드림";
-  const description = latestResult?.summary || "수정구슬 앞의 느긋한 점술사 너굴이와 오늘의 사주 흐름을 확인해보세요.";
-
-  window.Kakao.Share.sendDefault({
-    objectType: "feed",
-    content: {
-      title: titleText,
-      description,
-      imageUrl,
-      link: {
-        mobileWebUrl: pageUrl,
-        webUrl: pageUrl
-      }
-    },
-    buttons: [
-      {
-        title: "운세 보러가기",
-        link: {
-          mobileWebUrl: pageUrl,
-          webUrl: pageUrl
-        }
-      }
-    ]
-  });
-}
-
-function showElement(element) {
-  element?.classList.remove("is-hidden");
-}
-
-function hideElement(element) {
-  element?.classList.add("is-hidden");
-}
-
-function scrollToPanel(element) {
-  element?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
+// 폼 안 select 변경도 미리보기·카드 강조까지 같이 동기화
+sajuForm?.elements.topic?.addEventListener("change", (event) => applyTopic(event.target.value));
 
 function collectFormData() {
   const data = new FormData(sajuForm);
-  return {
+  const topic = data.get("topic") || selectedTopic;
+  const payload = {
     nickname: String(data.get("nickname") || "너굴 손님").trim(),
     birthDate: data.get("birthDate"),
     birthTime: data.get("birthTime"),
     calendarType: data.get("calendarType"),
     gender: data.get("gender"),
-    topic: data.get("topic") || selectedTopic,
+    topic,
     question: String(data.get("question") || "").trim()
   };
+
+  if (topic === "match") {
+    payload.partner = {
+      name: String(data.get("partnerName") || "상대방").trim(),
+      birthDate: data.get("partnerBirthDate"),
+      birthTime: data.get("partnerBirthTime"),
+      calendarType: data.get("partnerCalendarType"),
+      gender: data.get("partnerGender")
+    };
+  }
+
+  return payload;
 }
 
 async function requestFortune(payload) {
@@ -173,9 +132,7 @@ async function requestFortune(payload) {
 
   const response = await fetch(`${kakaoConfig.apiBaseUrl.replace(/\/$/, "")}/fortune`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
 
@@ -191,15 +148,36 @@ function createDemoFortune(payload) {
   const name = payload.nickname || "너굴 손님";
   const question = payload.question ? ` 특히 "${payload.question}"에 대해서는 작게 확인하고 빠르게 움직이는 쪽이 좋습니다.` : "";
 
+  if (payload.topic === "match") {
+    const partnerName = payload.partner?.name || "상대방";
+    return Promise.resolve({
+      topic: label,
+      title: `${name}님과 ${partnerName}님은 보완되는 궁합입니다`,
+      summary: `서로 속도가 달라 보여도 역할이 나뉘면 안정적인 흐름이 됩니다. 비슷함보다 채워주는 부분을 보세요.${question}`,
+      scores: { love: 76, money: 60, career: 68 },
+      good: [
+        "표현 방식이 달라 처음엔 어색해도 곧 서로의 리듬을 이해하게 됩니다.",
+        "한 사람이 추진하면 다른 사람이 정리하는 역할 분담이 잘 맞습니다.",
+        "솔직한 대화를 미루지 않으면 관계의 온도가 빠르게 올라갑니다."
+      ],
+      caution: [
+        "기대를 말하지 않고 속으로만 재면 오해가 쌓이기 쉽습니다.",
+        "중요한 약속은 가볍게 넘기지 말고 한 번 더 확인하세요."
+      ],
+      actions: [
+        "오늘 상대에게 짧고 분명하게 마음을 한 번 표현하기",
+        "서로의 다른 점을 단점이 아니라 역할로 바라보기",
+        "다음 만남 일정을 먼저 가볍게 제안하기"
+      ],
+      source: "demo"
+    });
+  }
+
   return Promise.resolve({
     topic: label,
     title: `${name}님, ${label}은 천천히 풀리는 흐름입니다`,
     summary: `오늘은 크게 밀어붙이기보다 정리, 관찰, 짧은 실행이 잘 맞습니다.${question}`,
-    scores: {
-      love: 72,
-      money: 64,
-      career: 78
-    },
+    scores: { love: 72, money: 64, career: 78 },
     good: [
       "오전에 미뤄둔 연락을 정리하면 오후 흐름이 가벼워집니다.",
       "새 선택보다 기존 계획을 다듬는 일이 좋은 결과로 이어집니다.",
@@ -251,11 +229,12 @@ function renderResult(result) {
 
   const scoreGrid = document.querySelector("#score-grid");
   scoreGrid.innerHTML = "";
-  [
-    ["love", "애정"],
-    ["money", "재물"],
-    ["career", "일"]
-  ].forEach(([key, label]) => {
+  // 궁합은 애정/재물/일 라벨이 안 맞아 끌림/대화/안정으로 바꿔 보여준다
+  const isMatch = result.request?.topic === "match";
+  const scoreLabels = isMatch
+    ? [["love", "끌림"], ["money", "대화"], ["career", "안정"]]
+    : [["love", "애정"], ["money", "재물"], ["career", "일"]];
+  scoreLabels.forEach(([key, label]) => {
     const card = document.createElement("div");
     card.className = "score-card";
     card.innerHTML = `<strong>${Number(result.scores[key] || 0)}</strong><span>${label}</span>`;
@@ -266,9 +245,7 @@ function renderResult(result) {
   renderList(document.querySelector("#result-caution"), result.caution);
   renderList(document.querySelector("#result-actions"), result.actions);
 
-  hideElement(loadingPage);
-  showElement(resultPage);
-  scrollToPanel(resultPage);
+  go("/result");
 }
 
 function readHistory() {
@@ -310,10 +287,8 @@ async function handleSubmit(event) {
   event.preventDefault();
   const payload = collectFormData();
 
-  hideElement(resultPage);
-  hideElement(historyPage);
-  showElement(loadingPage);
-  scrollToPanel(loadingPage);
+  showScreen("loading");
+  window.scrollTo({ top: 0, behavior: "auto" });
 
   try {
     const rawResult = await requestFortune(payload);
@@ -321,10 +296,9 @@ async function handleSubmit(event) {
     saveHistory(result);
     renderResult(result);
   } catch (error) {
-    const fallback = await createDemoFortune({
-      ...payload,
-      question: payload.question
-    });
+    // 실패를 조용히 숨기지 않고 사용자에게 알린 뒤 미리보기로 대체
+    toast("지금 연결이 불안정해 미리보기 운세를 보여드려요.");
+    const fallback = await createDemoFortune(payload);
     const result = normalizeResult(fallback, payload);
     result.title = "너굴이가 먼저 본 미리보기 운세입니다";
     saveHistory(result);
@@ -332,23 +306,15 @@ async function handleSubmit(event) {
   }
 }
 
+// "무료로 보기" / "다시 보기" → 홈으로 가서 입력 폼으로 스크롤
 startButtons.forEach((button) => {
-  button.addEventListener("click", () => scrollToPanel(formSection));
-});
-
-historyButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    hideElement(resultPage);
-    hideElement(loadingPage);
-    renderHistory();
-    showElement(historyPage);
-    scrollToPanel(historyPage);
+    pendingFormScroll = true;
+    go("/home");
   });
 });
 
-scrollTopButtons.forEach((button) => {
-  button.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-});
+historyButtons.forEach((button) => button.addEventListener("click", () => go("/history")));
 
 clearHistoryButton?.addEventListener("click", () => {
   localStorage.removeItem(historyKey);
@@ -356,13 +322,3 @@ clearHistoryButton?.addEventListener("click", () => {
 });
 
 sajuForm?.addEventListener("submit", handleSubmit);
-
-loginButtons.forEach((button) => {
-  button.addEventListener("click", startKakaoLogin);
-});
-
-shareButtons.forEach((button) => {
-  button.addEventListener("click", startKakaoShare);
-});
-
-initKakao();

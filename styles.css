@@ -524,6 +524,28 @@ button {
   scroll-margin-top: 16px;
 }
 
+.partner-fields {
+  display: grid;
+  gap: 12px;
+  margin: 2px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fffdf8;
+}
+
+.partner-fields legend {
+  padding: 0 6px;
+  font-weight: 900;
+  color: var(--denim-dark);
+}
+
+.partner-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft, #6b6256);
+}
+
 .section-head.compact {
   align-items: start;
 }
@@ -769,4 +791,195 @@ button {
   .primary-button {
     width: 100%;
   }
+}
+
+/* ---------------------------- 궁합 방 (공유 참여) ---------------------------- */
+
+.room-status {
+  margin: 0 0 6px;
+  color: var(--coral);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.room-status:empty {
+  display: none;
+}
+
+.room-intro {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.people-chips {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.people-chip {
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fffdf8;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.people-chip.is-me {
+  border-color: var(--denim);
+  background: var(--denim);
+  color: #fff;
+}
+
+.match-rank {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  counter-reset: match;
+}
+
+.match-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fffdf8;
+}
+
+.match-pair {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.match-pair em {
+  font-style: normal;
+  color: var(--coral);
+  margin: 0 4px;
+}
+
+.match-score {
+  display: grid;
+  justify-items: end;
+  line-height: 1.1;
+}
+
+.match-score strong {
+  font-size: 20px;
+  color: var(--denim-dark);
+}
+
+.match-score small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.my-match {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--gold);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff6e2, #fffdf8);
+}
+
+.my-match strong {
+  font-size: 18px;
+  color: var(--denim-dark);
+}
+
+.my-match span {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.room-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.room-link-input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fffdf8;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* 패널 헤더 우측 액션 묶음 (← 홈 / 공유 등) */
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 결과 화면 상단 — 자신만만 너굴맨 (짜잔) */
+.result-mascot {
+  display: block;
+  width: 84px;
+  height: 84px;
+  margin: 2px auto 10px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 14px rgba(76, 49, 23, 0.16));
+}
+
+/* 결과 화면 하단 — 궁합 방 권유 (바이럴 진입점) */
+.result-room-cta {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--gold);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff6e2, #fffdf8);
+  text-align: center;
+}
+
+.result-room-text {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--denim-dark);
+}
+
+.result-room-sub {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.result-room-cta .primary-button {
+  width: 100%;
+}
+
+/* 전역 토스트 (실패 안내·링크 복사 등) */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  max-width: min(420px, 88vw);
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--denim-dark);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: var(--shadow);
+  z-index: 50;
 }

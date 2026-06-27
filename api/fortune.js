@@ -1,24 +1,18 @@
-const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
+const crypto = require("crypto");
+const { redis, redisConfigured, rateLimit } = require("../lib/redis");
+const { corsHeaders, sendJson, readBody, clientIp } = require("../lib/http");
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": process.env.ALLOWED_ORIGIN || "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type"
-};
+const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
+const FORTUNE_LIMIT_PER_HOUR = 60; // IP당 시간당 운세 생성 상한
+const MAX_OUTPUT_TOKENS = 700;     // 출력 토큰 상한 (비용 캡)
 
 const fortuneSchema = {
   type: "object",
   additionalProperties: false,
   properties: {
-    topic: {
-      type: "string"
-    },
-    title: {
-      type: "string"
-    },
-    summary: {
-      type: "string"
-    },
+    topic: { type: "string" },
+    title: { type: "string" },
+    summary: { type: "string" },
     scores: {
       type: "object",
       additionalProperties: false,
@@ -29,32 +23,51 @@ const fortuneSchema = {
       },
       required: ["love", "money", "career"]
     },
-    good: {
-      type: "array",
-      items: { type: "string" }
-    },
-    caution: {
-      type: "array",
-      items: { type: "string" }
-    },
-    actions: {
-      type: "array",
-      items: { type: "string" }
-    }
+    good: { type: "array", items: { type: "string" } },
+    caution: { type: "array", items: { type: "string" } },
+    actions: { type: "array", items: { type: "string" } }
   },
   required: ["topic", "title", "summary", "scores", "good", "caution", "actions"]
 };
 
-function sendJson(response, status, payload) {
-  response.writeHead(status, {
-    ...corsHeaders,
-    "Content-Type": "application/json; charset=utf-8"
-  });
-  response.end(JSON.stringify(payload));
+/* ----------------------------- 캐시 키/TTL ----------------------------- */
+
+function todayKST() {
+  const kst = new Date(Date.now() + 9 * 3600 * 1000);
+  return kst.toISOString().slice(0, 10); // KST 기준 YYYY-MM-DD
+}
+
+function secondsUntilKstMidnight() {
+  const kst = new Date(Date.now() + 9 * 3600 * 1000);
+  const secondsToday = kst.getUTCHours() * 3600 + kst.getUTCMinutes() * 60 + kst.getUTCSeconds();
+  return Math.max(60, 86400 - secondsToday);
+}
+
+// 같은 입력 → 같은 캐시 키. 오늘운세는 날짜까지 포함해 자정에 자연 갱신.
+function cacheKeyFor(body) {
+  const parts = [
+    body.topic || "today",
+    body.birthDate || "",
+    body.birthTime || "",
+    body.calendarType || "",
+    body.gender || "",
+    (body.question || "").trim()
+  ];
+  if (body.topic === "match" && body.partner) {
+    const p = body.partner;
+    parts.push(p.birthDate || "", p.birthTime || "", p.calendarType || "", p.gender || "");
+  }
+  if (body.topic === "today") parts.push(todayKST());
+  const hash = crypto.createHash("sha1").update(parts.join("|")).digest("hex").slice(0, 24);
+  return `fortune:${hash}`;
+}
+
+function cacheTtl(body) {
+  return body.topic === "today" ? secondsUntilKstMidnight() : 86400;
 }
 
 function buildPrompt(body) {
-  return [
+  const lines = [
     "너는 한국어 모바일 사주 앱 '너굴 사주'의 운세 작성자다.",
     "전통 명리학을 단정적 예언처럼 말하지 말고, 사용자가 오늘 참고할 수 있는 생활 조언으로 풀어라.",
     "의학, 법률, 투자 확정 조언은 하지 마라.",
@@ -66,8 +79,24 @@ function buildPrompt(body) {
     `달력: ${body.calendarType || "solar"}`,
     `성별: ${body.gender || "unspecified"}`,
     `운세 주제: ${body.topic || "today"}`,
-    `질문: ${body.question || "없음"}`,
-    "",
+    `질문: ${body.question || "없음"}`
+  ];
+
+  if (body.topic === "match") {
+    const partner = body.partner || {};
+    lines.push(
+      "",
+      "이것은 두 사람의 궁합 요청이다. 본인과 상대방의 사주를 함께 고려해 관계 흐름, 잘 맞는 부분, 주의할 부분을 균형 있게 써라.",
+      `상대 호칭: ${partner.name || "상대방"}`,
+      `상대 생년월일: ${partner.birthDate || "unknown"}`,
+      `상대 태어난 시간: ${partner.birthTime || "unknown"}`,
+      `상대 달력: ${partner.calendarType || "solar"}`,
+      `상대 성별: ${partner.gender || "unspecified"}`
+    );
+  }
+
+  lines.push("");
+  return lines.concat([
     "JSON 스키마:",
     "{",
     '  "topic": "오늘운세|애정운|재물운|직장운|궁합|신년운세",',
@@ -78,12 +107,12 @@ function buildPrompt(body) {
     '  "caution": ["주의할 점 2-3개"],',
     '  "actions": ["오늘 할 행동 2-3개"]',
     "}"
-  ].join("\n");
+  ]).join("\n");
 }
 
 module.exports = async function handler(request, response) {
   if (request.method === "OPTIONS") {
-    response.writeHead(204, corsHeaders);
+    response.writeHead(204, corsHeaders());
     response.end();
     return;
   }
@@ -99,7 +128,28 @@ module.exports = async function handler(request, response) {
   }
 
   try {
-    const body = typeof request.body === "string" ? JSON.parse(request.body || "{}") : request.body || {};
+    const body = await readBody(request);
+
+    // ③ IP당 상한 + ① 캐시 조회 (Redis 있을 때만)
+    let cacheKey = null;
+    if (redisConfigured()) {
+      const limit = await rateLimit(`rl:fortune:${clientIp(request)}`, FORTUNE_LIMIT_PER_HOUR, 3600);
+      if (!limit.allowed) {
+        sendJson(response, 429, { error: "오늘 운세를 너무 많이 봤어요. 잠시 후 다시 시도해 주세요." });
+        return;
+      }
+      cacheKey = cacheKeyFor(body);
+      try {
+        const cached = await redis(["GET", cacheKey]);
+        if (cached) {
+          sendJson(response, 200, JSON.parse(cached));
+          return;
+        }
+      } catch {
+        /* 캐시 조회 실패는 무시하고 실제 호출로 진행 */
+      }
+    }
+
     const upstream = await fetch(OPENAI_RESPONSES_URL, {
       method: "POST",
       headers: {
@@ -109,6 +159,7 @@ module.exports = async function handler(request, response) {
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
         input: buildPrompt(body),
+        max_output_tokens: MAX_OUTPUT_TOKENS, // ④ 출력 토큰 상한
         text: {
           format: {
             type: "json_schema",
@@ -130,7 +181,18 @@ module.exports = async function handler(request, response) {
     }
 
     const text = data.output_text || data.output?.[0]?.content?.[0]?.text || "{}";
-    sendJson(response, 200, JSON.parse(text));
+    const result = JSON.parse(text);
+
+    // ① 결과 캐시 저장 (best-effort)
+    if (cacheKey) {
+      try {
+        await redis(["SET", cacheKey, JSON.stringify(result), "EX", String(cacheTtl(body))]);
+      } catch {
+        /* 캐시 저장 실패는 응답에 영향 없음 */
+      }
+    }
+
+    sendJson(response, 200, result);
   } catch (error) {
     sendJson(response, 500, {
       error: error instanceof Error ? error.message : "Unexpected server error"

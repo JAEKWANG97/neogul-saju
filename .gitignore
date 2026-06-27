@@ -1,4 +1,9 @@
 .DS_Store
+.env
+.env.local
+.env*.local
+.vercel
+node_modules
 assets/ChatGPT Image*.png
 assets/*-previous.png
 assets/og-image-source.png

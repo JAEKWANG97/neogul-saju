@@ -6,7 +6,9 @@
 
 - `index.html`: 화면 구조
 - `styles.css`: 모바일 UI 스타일
-- `script.js`: 운세 메뉴, 입력, 결과, 기록, 카카오 로그인/공유 흐름
+- `js/core.js`: 앱 셸 — 해시 라우팅(`#/home`·`#/result`·`#/history`·`#/room/<id>`), 토스트, 카카오 로그인/공유, 공통 헬퍼
+- `js/fortune.js`: 개인 운세 — 주제 선택, 입력 폼, 결과 렌더, 기록(localStorage)
+- `js/room.js`: 궁합 방 — 생성/참여/대시보드, 결정론적 궁합 점수, 공유, 폴링 + 라우터 초기화
 - `config.js`: 카카오 로그인 설정
 - `api/fortune.js`: Vercel 서버리스 GPT 운세 생성 예시
 - `assets/mascot.svg`: 기본 캐릭터 자리 표시 이미지
@@ -106,3 +108,58 @@ window.NEOGUL_SAJU_CONFIG = {
   "actions": ["오늘 할 행동"]
 }
 ```
+
+## 궁합 방 (단톡방 공유 참여)
+
+채팅방 친구들이 다 같이 참여하는 바이럴 기능입니다.
+
+흐름:
+
+1. 홈에서 `궁합 방 만들기` → 방 생성
+2. 대시보드의 `카카오톡으로 친구 더 부르기`로 방 링크(`?room=방ID`)를 단톡방에 공유
+3. 친구들이 링크를 열고 각자 사주를 입력해 참여
+4. 모두가 같은 대시보드에서 참여자 목록, `최고의 궁합 TOP`, `나와 제일 잘 맞는 사람`을 확인 (20초마다 자동 갱신, 탭이 보일 때만·10분 후 자동 정지)
+
+궁합 점수는 두 사람의 생년월일·태어난 시간으로 **항상 같은 값이 나오는 결정론적 계산**(`script.js`의 `chemistry`)이라, 페어마다 GPT를 호출하지 않습니다. 백엔드는 방과 참여자 저장만 담당합니다.
+
+### 방 백엔드 (`api/room.js`)
+
+Upstash Redis REST를 사용하며, 별도 npm 의존성 없이 `fetch`만으로 동작합니다.
+
+필요한 환경변수:
+
+- `UPSTASH_REDIS_REST_URL`: Upstash Redis REST URL
+- `UPSTASH_REDIS_REST_TOKEN`: Upstash Redis REST 토큰
+- `ALLOWED_ORIGIN`: 허용할 프론트 도메인 (CORS)
+
+엔드포인트:
+
+- `POST {apiBaseUrl}/room` body `{ "action": "create", "title": "..." }` → 방 생성, `{ id, participants: [] }` 반환
+- `POST {apiBaseUrl}/room` body `{ "action": "join", "roomId": "...", "participant": {...} }` → 참여
+- `GET {apiBaseUrl}/room?id=방ID` → 방 + 참여자 조회
+
+방 데이터는 7일 후 자동 만료됩니다.
+
+### 동작 조건 정리
+
+- **카카오톡 공유**: `config.js`의 `kakaoJavaScriptKey`가 채워지고, 카카오 개발자센터에 배포 도메인이 등록되어 있어야 동작합니다. 키가 없으면 공유 버튼은 링크 복사로 대체됩니다.
+- **방 기능(멀티 참여)**: `config.js`의 `apiBaseUrl`이 배포된 백엔드를 가리켜야 합니다. `apiBaseUrl`이 비어 있으면 단일 기기 localStorage **데모 모드**로만 동작합니다(여러 기기 공유 불가, UX 미리보기용).
+
+## 배포 (전부 Vercel)
+
+프론트(정적 파일)와 백엔드(`api/*`)를 같은 Vercel 프로젝트에 올립니다. 같은 도메인이라 CORS 설정이 필요 없고, `config.js`의 `apiBaseUrl`은 `/api` 상대경로를 씁니다.
+
+순서:
+
+1. **Upstash Redis 생성** — [console.upstash.com](https://console.upstash.com)에서 Redis DB를 만들고 REST `URL`/`TOKEN`을 복사
+2. **OpenAI 키 발급** — 운세 기능을 쓸 경우 (방 기능만이면 생략 가능)
+3. **Vercel에 프로젝트 import** — 이 GitHub 저장소를 연결. 프레임워크 없음(Other), 빌드 명령 없음. `api/*.js`는 서버리스 함수로 자동 인식됩니다.
+4. **환경변수 등록** (Vercel → Settings → Environment Variables, `.env.example` 참고)
+   - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+   - `OPENAI_API_KEY` (운세용), 선택 `OPENAI_MODEL`
+5. **배포** 후 발급된 도메인(`https://<프로젝트>.vercel.app`)으로 접속
+6. **카카오 키 설정** — `config.js`의 `kakaoJavaScriptKey`를 채우고, 카카오 개발자센터에 그 Vercel 도메인을 등록
+
+`package.json`은 의존성 없이 Node 런타임만 지정합니다(`api/*`는 Node 내장 `crypto`, 전역 `fetch`만 사용).
+
+로컬에서 백엔드까지 함께 돌리려면 `npx vercel dev`를 쓰면 됩니다. 정적 화면만 빠르게 볼 때는 `apiBaseUrl`을 `""`로 비우면 localStorage 데모 모드로 동작합니다.
