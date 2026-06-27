@@ -39,6 +39,12 @@ select {
   font: inherit;
 }
 
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
 button {
   cursor: pointer;
 }
@@ -374,6 +380,7 @@ button {
 .quick-form label,
 .fortune-form label {
   display: grid;
+  min-width: 0;
   gap: 6px;
   color: var(--muted);
   font-size: 13px;
@@ -391,6 +398,8 @@ button {
   background: #fffdf8;
   color: var(--ink);
   outline: 0;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .quick-form input,
@@ -399,6 +408,20 @@ button {
 .fortune-form select {
   height: 48px;
   padding: 0 13px;
+  font-size: 16px;
+}
+
+.quick-form input[type="date"],
+.fortune-form input[type="date"] {
+  padding-right: 10px;
+  line-height: 48px;
+  white-space: nowrap;
+}
+
+.quick-form input[type="date"]::-webkit-date-and-time-value,
+.fortune-form input[type="date"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
 }
 
 .fortune-form textarea {
@@ -419,7 +442,7 @@ button {
 
 .field-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
 }
 
@@ -694,6 +717,18 @@ button {
 
   .fortune-card strong {
     font-size: 14px;
+  }
+
+  .quick-form input,
+  .quick-form select,
+  .fortune-form input,
+  .fortune-form select {
+    padding-inline: 11px;
+    font-size: 15px;
+  }
+
+  .field-row {
+    gap: 8px;
   }
 
   .primary-button {
