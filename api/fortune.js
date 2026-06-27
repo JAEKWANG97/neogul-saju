@@ -5,7 +5,7 @@ const { corsHeaders, sendJson, readBody, clientIp } = require("../lib/http");
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const FORTUNE_LIMIT_PER_HOUR = 60; // IP당 시간당 운세 생성 상한
 const MAX_OUTPUT_TOKENS = 1000;    // 출력 토큰 상한 (비용 캡)
-const PROMPT_VERSION = "saju-depth-v5";
+const PROMPT_VERSION = "saju-depth-v6";
 
 const fortuneSchema = {
   type: "object",
@@ -111,6 +111,7 @@ function buildPrompt(body) {
     "- 의학, 법률, 투자 확정 조언은 하지 않는다.",
     "- AI, 모델, 프롬프트, 생성 같은 표현은 절대 쓰지 않는다.",
     "- 사용자가 모바일에서 읽으므로 문장은 짧고 밀도 있게 쓴다.",
+    "- 모든 문장은 자연스러운 존댓말로 쓰고, 문장부호로 끝낸다.",
     "",
     "재미와 몰입감 규칙:",
     "- 사주 용어만 늘어놓지 말고, 일상에서 바로 그려지는 비유를 섞는다.",
@@ -127,7 +128,7 @@ function buildPrompt(body) {
     "- good은 좋은 흐름을 3개로 쓰되 각각 다른 관점이어야 하며, 한 항목은 가볍게 미소가 나는 표현을 허용한다.",
     "- caution은 주의할 점을 2-3개로 쓰되 겁주는 표현보다 조절 포인트로 쓴다.",
     "- actions는 당장 실행 가능한 행동 3개로 쓰고, 너무 도덕 교과서처럼 쓰지 않는다.",
-    "- 각 배열 항목은 한 문장으로 끝내고, 지나치게 길게 쓰지 않는다.",
+    "- 각 배열 항목은 한 문장으로 끝내고, 지나치게 길게 쓰지 않으며, 반드시 마침표로 마무리한다.",
     "- 응답은 반드시 JSON 객체만 출력한다.",
     "",
     `닉네임: ${body.nickname || "너굴 손님"}`,
