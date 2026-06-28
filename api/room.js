@@ -93,8 +93,9 @@ module.exports = async function handler(request, response) {
         createdAt: new Date().toISOString(),
         participants: []
       };
-      if (body.host) {
-        room.participants.push(sanitizeParticipant(body.host));
+      const initialParticipant = body.participant || body.host;
+      if (initialParticipant) {
+        room.participants.push(sanitizeParticipant(initialParticipant));
       }
       await writeRoom(room);
       sendJson(response, 200, room);

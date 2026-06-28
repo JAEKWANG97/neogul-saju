@@ -4,6 +4,9 @@
  * ========================================================================= */
 
 const topics = {
+  overall: {
+    kicker: "종합사주"
+  },
   today: {
     kicker: "오늘운세"
   },
@@ -25,6 +28,7 @@ const topics = {
 };
 
 const topicLabels = {
+  overall: "종합사주",
   today: "오늘운세",
   love: "애정운",
   money: "재물운",
@@ -35,7 +39,9 @@ const topicLabels = {
 
 const cards = document.querySelectorAll(".fortune-card");
 const kicker = document.querySelector("#topic-kicker");
+const formTitle = document.querySelector("#form-title");
 const startButtons = document.querySelectorAll(".js-start-reading");
+const topicStartButtons = document.querySelectorAll(".js-start-topic");
 const historyButtons = document.querySelectorAll(".js-show-history");
 const clearHistoryButton = document.querySelector(".js-clear-history");
 const sajuForm = document.querySelector("#saju-form");
@@ -43,15 +49,17 @@ const partnerFields = document.querySelector("#partner-fields");
 const historyList = document.querySelector("#history-list");
 const historyKey = "neogul-saju-history";
 
-let selectedTopic = "today";
+let selectedTopic = "overall";
 let latestResult = null;
 let fortuneRequestPending = false;
 
 function togglePartnerFields(topic) {
   const isMatch = topic === "match";
   partnerFields?.classList.toggle("is-hidden", !isMatch);
-  const partnerBirthDate = sajuForm?.elements.partnerBirthDate;
-  if (partnerBirthDate) partnerBirthDate.required = isMatch;
+  ["partnerBirthYear", "partnerBirthMonth", "partnerBirthDay"].forEach((name) => {
+    const field = sajuForm?.elements[name];
+    if (field) field.required = isMatch;
+  });
 }
 
 // 주제 선택의 단일 소스: 카드 강조 / 폼 select / 상대방칸을 한 번에 동기화
@@ -62,6 +70,9 @@ function applyTopic(topicKey) {
   selectedTopic = topicKey;
   cards.forEach((item) => item.classList.toggle("active", item.dataset.topic === topicKey));
   if (kicker) kicker.textContent = topic.kicker;
+  if (formTitle) {
+    formTitle.textContent = topicKey === "overall" ? "생년월일로 깊게 보기" : `${topic.kicker} 보기`;
+  }
 
   const topicSelect = sajuForm?.elements.topic;
   if (topicSelect && topicSelect.value !== topicKey) topicSelect.value = topicKey;
@@ -89,7 +100,7 @@ function collectFormData() {
   const topic = data.get("topic") || selectedTopic;
   const payload = {
     nickname: String(data.get("nickname") || "너굴 손님").trim(),
-    birthDate: data.get("birthDate"),
+    birthDate: birthDateFromData(data, "birth"),
     birthTime: data.get("birthTime"),
     calendarType: data.get("calendarType"),
     gender: data.get("gender"),
@@ -100,7 +111,7 @@ function collectFormData() {
   if (topic === "match") {
     payload.partner = {
       name: String(data.get("partnerName") || "상대방").trim(),
-      birthDate: data.get("partnerBirthDate"),
+      birthDate: birthDateFromData(data, "partnerBirth"),
       birthTime: data.get("partnerBirthTime"),
       calendarType: data.get("partnerCalendarType"),
       gender: data.get("partnerGender")
@@ -132,6 +143,38 @@ function createDemoFortune(payload) {
   const label = topicLabels[payload.topic] || "오늘운세";
   const name = payload.nickname || "너굴 손님";
   const question = payload.question ? ` 특히 "${payload.question}"에 대해서는 작게 확인하고 빠르게 움직이는 쪽이 좋습니다.` : "";
+
+  if (payload.topic === "overall") {
+    return Promise.resolve({
+      topic: label,
+      title: `${name}님은 천천히 깊어지는 사람입니다`,
+      oneLiner: "처음엔 조용해 보여도, 기준이 서면 오래 밀고 가는 기운이 강해요.",
+      summary: `타고난 흐름은 빠르게 튀기보다 안쪽에서 기준을 세우고 오래 가져가는 쪽에 가깝습니다. 관계에서는 바로 뜨거워지는 말보다 꾸준히 지키는 태도에서 신뢰가 쌓이고, 일과 돈에서는 작은 루틴이 모여 큰 안정감으로 이어집니다. 지금은 욕심을 크게 벌리기보다 내가 반복해서 잘할 수 있는 방식을 찾는 게 운을 쓰는 가장 좋은 방법입니다.${question}`,
+      scene: "카톡을 바로 보내지 않아도 마음이 없는 건 아니고, 회의에서 말수가 많지 않아도 결정적인 한마디를 준비하는 쪽에 가깝습니다. 지갑을 열 때도 기분보다 기준이 먼저 서면 훨씬 편해집니다.",
+      scores: { love: 74, money: 69, career: 82 },
+      good: [
+        "관계에서는 한 번 믿은 사람에게 오래 가는 힘이 있어, 시간이 지날수록 진가가 드러납니다.",
+        "일에서는 급한 반응보다 정리된 판단이 강점이라, 복잡한 상황에서 기준을 잡는 역할이 잘 맞습니다.",
+        "돈은 크게 한 번 잡기보다 새는 구멍을 막을 때 안정감이 빠르게 올라옵니다."
+      ],
+      caution: [
+        "생각을 너무 오래 품고 있으면 주변 사람은 무심하다고 느낄 수 있습니다.",
+        "완벽하게 준비된 뒤 움직이려 하면 좋은 타이밍을 지나칠 수 있습니다.",
+        "피곤할수록 말이 짧아지니, 중요한 관계에는 짧은 설명 한 줄을 남기는 게 좋습니다."
+      ],
+      actions: [
+        "오늘 중요한 사람에게 답장이 늦은 이유를 짧게라도 말해두기.",
+        "이번 주에 반복해서 지킬 수 있는 돈 관리 기준 하나만 정하기.",
+        "일이나 공부에서 미뤄둔 정리 작업을 20분만 먼저 끝내기."
+      ],
+      basis: [
+        "입력한 생년월일의 흐름은 겉으로 드러나는 속도보다 안쪽의 지속성이 강하게 읽힙니다.",
+        "오행의 균형은 한쪽으로 확 밀기보다 부족한 부분을 루틴으로 보완할 때 편해지는 구조입니다.",
+        "십신의 결은 관계와 일에서 역할을 분명히 할수록 안정되는 쪽이라, 말보다 반복 행동이 운을 키웁니다."
+      ],
+      source: "demo"
+    });
+  }
 
   if (payload.topic === "match") {
     const partnerName = payload.partner?.name || "상대방";
@@ -371,6 +414,14 @@ startButtons.forEach((button) => {
   button.addEventListener("click", () => {
     pendingFormScroll = true;
     go("/home");
+  });
+});
+
+topicStartButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    applyTopic(button.dataset.topic || "overall");
+    revealForm();
+    scrollToPanel(formSection);
   });
 });
 

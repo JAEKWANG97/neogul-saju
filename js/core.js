@@ -42,6 +42,69 @@ function toast(message) {
   toastTimer = setTimeout(() => toastEl.classList.add("is-hidden"), 3200);
 }
 
+function pad2(value) {
+  return String(value).padStart(2, "0");
+}
+
+function daysInMonth(year, month) {
+  if (!year || !month) return 31;
+  return new Date(Number(year), Number(month), 0).getDate();
+}
+
+function fillSelect(select, options, placeholder) {
+  const previous = select.value;
+  select.innerHTML = "";
+  const empty = document.createElement("option");
+  empty.value = "";
+  empty.textContent = placeholder;
+  select.append(empty);
+  options.forEach(([value, label]) => {
+    const option = document.createElement("option");
+    option.value = String(value);
+    option.textContent = label;
+    select.append(option);
+  });
+  if ([...select.options].some((option) => option.value === previous)) {
+    select.value = previous;
+  }
+}
+
+function syncDateDays(group) {
+  const year = group.querySelector('select[name$="Year"]')?.value;
+  const month = group.querySelector('select[name$="Month"]')?.value;
+  const day = group.querySelector('select[name$="Day"]');
+  if (!day) return;
+  const max = daysInMonth(year, month);
+  fillSelect(day, Array.from({ length: max }, (_, index) => [index + 1, `${index + 1}일`]), "일");
+}
+
+function initDateSelects() {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1919 }, (_, index) => {
+    const year = currentYear - index;
+    return [year, `${year}년`];
+  });
+  const months = Array.from({ length: 12 }, (_, index) => [index + 1, `${index + 1}월`]);
+
+  document.querySelectorAll(".js-date-select").forEach((group) => {
+    const year = group.querySelector('select[name$="Year"]');
+    const month = group.querySelector('select[name$="Month"]');
+    if (year) fillSelect(year, years, "연도");
+    if (month) fillSelect(month, months, "월");
+    syncDateDays(group);
+    year?.addEventListener("change", () => syncDateDays(group));
+    month?.addEventListener("change", () => syncDateDays(group));
+  });
+}
+
+function birthDateFromData(data, prefix = "birth") {
+  const year = data.get(`${prefix}Year`);
+  const month = data.get(`${prefix}Month`);
+  const day = data.get(`${prefix}Day`);
+  if (!year || !month || !day) return "";
+  return `${year}-${pad2(month)}-${pad2(day)}`;
+}
+
 /* ----------------------------- 화면 전환 ----------------------------- */
 
 const SCREEN_IDS = {
@@ -145,6 +208,11 @@ async function copyLink(url, message) {
 }
 
 function startKakaoShare() {
+  if (window.location.hash.startsWith("#/room/") && typeof shareRoom === "function") {
+    shareRoom();
+    return;
+  }
+
   const pageUrl = kakaoConfig.shareUrl || window.location.href;
 
   // 카카오 키가 없으면 버튼이 죽지 않도록 링크 복사로 대체
@@ -203,4 +271,5 @@ if (!kakaoConfig.kakaoJavaScriptKey || !kakaoConfig.enableKakaoLogin) {
 
 shareButtons.forEach((button) => button.addEventListener("click", startKakaoShare));
 
+initDateSelects();
 initKakao();

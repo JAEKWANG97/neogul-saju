@@ -27,7 +27,7 @@
           <span>너굴 사주</span>
         </a>
         <div class="top-actions">
-          <button class="share-button js-kakao-share" type="button" aria-label="카카오톡 공유">공유</button>
+          <button class="share-button js-kakao-share" type="button" aria-label="카카오톡 공유">톡 공유</button>
           <button class="login-button js-kakao-login" type="button">로그인</button>
         </div>
       </header>
@@ -35,17 +35,17 @@
       <div id="home-view">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">친구들이 들어올수록 완성되는</p>
-          <h1 id="hero-title">단톡방 사주 궁합판</h1>
-          <p>앱 설치 없이 링크 하나로 참여하고, 나랑 제일 잘 맞는 사람과 TOP 궁합 순위를 바로 확인하세요.</p>
+          <p class="eyebrow">카톡으로 같이 보고, 혼자 깊게 보는</p>
+          <h1 id="hero-title">궁합과 종합사주</h1>
+          <p>친구들과는 궁합판을 만들고, 혼자서는 내 기질과 흐름을 깊게 확인하세요.</p>
           <div class="hero-actions">
             <button class="primary-button hero-cta js-create-room" type="button">단톡방 궁합판 만들기</button>
-            <button class="ghost-button hero-secondary js-start-reading" type="button">내 운세 먼저 보기</button>
+            <button class="ghost-button hero-secondary js-start-topic" type="button" data-topic="overall">종합사주 보기</button>
           </div>
           <ul class="hero-proof" aria-label="참여 방식">
             <li>설치 없음</li>
             <li>로그인 없음</li>
-            <li>결제 없음</li>
+            <li>가볍게 참여</li>
           </ul>
         </div>
         <div class="mascot">
@@ -53,53 +53,66 @@
         </div>
       </section>
 
-      <nav class="fortune-grid" aria-label="운세 메뉴">
-        <button class="fortune-card active" type="button" data-topic="today">
-          <span class="card-icon sun" aria-hidden="true"></span>
-          <strong>오늘운세</strong>
-          <small>하루 흐름</small>
-        </button>
-        <button class="fortune-card" type="button" data-topic="love">
-          <span class="card-icon heart" aria-hidden="true"></span>
-          <strong>애정운</strong>
-          <small>관계 기류</small>
-        </button>
-        <button class="fortune-card" type="button" data-topic="money">
-          <span class="card-icon coin" aria-hidden="true"></span>
-          <strong>재물운</strong>
-          <small>수입과 지출</small>
-        </button>
-        <button class="fortune-card" type="button" data-topic="career">
-          <span class="card-icon bag" aria-hidden="true"></span>
-          <strong>직장운</strong>
-          <small>일과 기회</small>
-        </button>
-        <button class="fortune-card" type="button" data-topic="match">
-          <span class="card-icon link" aria-hidden="true"></span>
-          <strong>궁합</strong>
-          <small>상대와 인연</small>
-        </button>
-        <button class="fortune-card" type="button" data-topic="year">
-          <span class="card-icon moon" aria-hidden="true"></span>
-          <strong>신년운세</strong>
-          <small>올해 방향</small>
-        </button>
-      </nav>
+      <section class="main-feature-grid" aria-label="주요 기능">
+        <article class="main-feature-card feature-room">
+          <p class="panel-kicker">친구랑 보는 메인 기능</p>
+          <h2>단톡방 궁합판</h2>
+          <p>링크를 보내면 친구들이 들어올 때마다 나와 맞는 사람, TOP 궁합, 의외의 케미가 열립니다.</p>
+          <button class="primary-button js-create-room" type="button">궁합판 만들기</button>
+        </article>
 
-      <section class="room-promo page-panel" aria-labelledby="room-promo-title">
-        <div>
-          <p class="panel-kicker">카톡 단톡방용</p>
-          <h2 id="room-promo-title">친구가 들어와야 순위가 뒤집혀요</h2>
-          <p>먼저 방을 만들고 링크를 보내세요. 친구들이 닉네임과 생년월일만 넣으면 관계 케미가 하나씩 열립니다.</p>
+        <article class="main-feature-card feature-overall">
+          <p class="panel-kicker">혼자 보는 메인 기능</p>
+          <h2>종합사주풀이</h2>
+          <p>타고난 기질, 관계 방식, 돈과 일의 반복 패턴을 한 번에 깊게 풀어봅니다.</p>
+          <button class="secondary-button js-start-topic" type="button" data-topic="overall">종합사주 보기</button>
+        </article>
+      </section>
+
+      <section class="sub-fortune-section" aria-labelledby="sub-fortune-title">
+        <div class="sub-section-head">
+          <p class="panel-kicker">가볍게 더 보기</p>
+          <h2 id="sub-fortune-title">오늘 필요한 운세만 골라보기</h2>
         </div>
-        <button class="secondary-button js-create-room" type="button">궁합판 바로 만들기</button>
+        <nav class="fortune-grid" aria-label="운세 메뉴">
+          <button class="fortune-card" type="button" data-topic="today">
+            <span class="card-icon sun" aria-hidden="true"></span>
+            <strong>오늘운세</strong>
+            <small>하루 흐름</small>
+          </button>
+          <button class="fortune-card" type="button" data-topic="love">
+            <span class="card-icon heart" aria-hidden="true"></span>
+            <strong>애정운</strong>
+            <small>관계 기류</small>
+          </button>
+          <button class="fortune-card" type="button" data-topic="money">
+            <span class="card-icon coin" aria-hidden="true"></span>
+            <strong>재물운</strong>
+            <small>수입과 지출</small>
+          </button>
+          <button class="fortune-card" type="button" data-topic="career">
+            <span class="card-icon bag" aria-hidden="true"></span>
+            <strong>직장운</strong>
+            <small>일과 기회</small>
+          </button>
+          <button class="fortune-card" type="button" data-topic="match">
+            <span class="card-icon link" aria-hidden="true"></span>
+            <strong>1:1 궁합</strong>
+            <small>상대와 인연</small>
+          </button>
+          <button class="fortune-card" type="button" data-topic="year">
+            <span class="card-icon moon" aria-hidden="true"></span>
+            <strong>신년운세</strong>
+            <small>올해 방향</small>
+          </button>
+        </nav>
       </section>
 
       <section class="quick-form page-panel is-hidden" id="fortune-form" aria-labelledby="form-title">
         <div class="section-head compact">
           <div>
-            <p class="panel-kicker">워밍업 운세</p>
-            <h2 id="form-title">내 흐름 먼저 보기</h2>
+            <p class="panel-kicker" id="topic-kicker">종합사주</p>
+            <h2 id="form-title">생년월일로 깊게 보기</h2>
           </div>
           <button class="text-button js-scroll-top" type="button">위로</button>
         </div>
@@ -110,7 +123,11 @@
           </label>
           <label>
             생년월일
-            <input name="birthDate" type="date" required>
+            <span class="date-select-row js-date-select" data-prefix="birth">
+              <select name="birthYear" aria-label="태어난 연도" required></select>
+              <select name="birthMonth" aria-label="태어난 월" required></select>
+              <select name="birthDay" aria-label="태어난 일" required></select>
+            </span>
           </label>
           <div class="field-row">
             <label>
@@ -150,6 +167,7 @@
           <label>
             보고 싶은 운세
             <select name="topic">
+              <option value="overall">종합사주</option>
               <option value="today">오늘운세</option>
               <option value="love">애정운</option>
               <option value="money">재물운</option>
@@ -167,7 +185,11 @@
             </label>
             <label>
               상대 생년월일
-              <input name="partnerBirthDate" type="date">
+              <span class="date-select-row js-date-select" data-prefix="partnerBirth">
+                <select name="partnerBirthYear" aria-label="상대 태어난 연도"></select>
+                <select name="partnerBirthMonth" aria-label="상대 태어난 월"></select>
+                <select name="partnerBirthDay" aria-label="상대 태어난 일"></select>
+              </span>
             </label>
             <div class="field-row">
               <label>
@@ -317,16 +339,19 @@
         <div class="history-list" id="history-list"></div>
       </section>
 
-      <section class="room-page page-panel is-hidden" id="room-page" aria-live="polite">
+      <section class="room-page page-panel is-hidden" id="room-page">
         <div class="section-head">
           <div>
             <p class="panel-kicker" id="room-kicker">궁합 방</p>
             <h2 id="room-title">방을 불러오는 중</h2>
           </div>
-          <button class="text-button js-go-home" type="button">← 홈</button>
+          <div class="head-actions">
+            <button class="text-button js-go-home" type="button">← 홈</button>
+            <button class="text-button js-share-room" type="button">친구 초대</button>
+          </div>
         </div>
 
-        <p class="room-status" id="room-status"></p>
+        <p class="room-status" id="room-status" role="status" aria-live="polite"></p>
 
         <div class="room-hero-card">
           <div>
@@ -344,6 +369,11 @@
             <li><strong>3</strong><span>친구 초대</span></li>
           </ol>
           <p class="room-intro" id="room-join-intro">닉네임과 생년월일만 넣으면 방 안의 친구들과 궁합 순위를 볼 수 있어요.</p>
+          <ul class="room-trust-list" aria-label="참여 안내">
+            <li>로그인 없음</li>
+            <li>생년월일은 친구들에게 공개되지 않음</li>
+            <li>설치 없음</li>
+          </ul>
           <form class="fortune-form" id="room-join-form">
             <label>
               닉네임
@@ -351,7 +381,11 @@
             </label>
             <label>
               생년월일
-              <input name="birthDate" type="date" required>
+              <span class="date-select-row js-date-select" data-prefix="birth">
+                <select name="birthYear" aria-label="태어난 연도" required></select>
+                <select name="birthMonth" aria-label="태어난 월" required></select>
+                <select name="birthDay" aria-label="태어난 일" required></select>
+              </span>
             </label>
             <div class="field-row">
               <label>
@@ -412,41 +446,80 @@
               <strong id="room-invite-title">친구가 들어와야 궁합판이 완성돼요</strong>
               <span id="room-invite-text">로그인 없이 닉네임과 생년월일만 넣으면 참여할 수 있어요.</span>
             </div>
-            <button class="secondary-button js-share-room" type="button">친구 초대하기</button>
+            <button class="secondary-button js-share-room kakao-action" type="button">카톡으로 친구 초대</button>
           </div>
 
-          <div class="room-people">
-            <p class="panel-kicker">참여한 친구들</p>
-            <ul class="people-chips" id="room-people-list"></ul>
-          </div>
+          <section class="room-scope room-mine-scope" aria-labelledby="room-mine-scope-title">
+            <div class="scope-head">
+              <p class="panel-kicker">내 기준</p>
+              <h3 id="room-mine-scope-title">내가 들어오면 바로 보이는 것</h3>
+            </div>
 
-          <div class="result-block" id="room-top-block">
-            <h3>최고의 궁합 TOP</h3>
-            <ol class="match-rank" id="room-top-list"></ol>
-          </div>
+            <div class="room-focus-panel">
+              <div class="my-character-card" id="room-my-character"></div>
 
-          <div class="result-block" id="room-surprise-block">
-            <h3>의외의 케미</h3>
-            <div class="surprise-match" id="room-surprise-match"></div>
-          </div>
+              <div class="room-insight-list">
+                <div class="room-insight-row" id="room-mine-block">
+                  <h3>나와 제일 잘 맞는 사람</h3>
+                  <div class="my-match" id="room-my-match"></div>
+                </div>
 
-          <div class="result-block" id="room-vibe-block">
-            <h3>오늘의 단톡방 운세</h3>
-            <p class="room-vibe" id="room-vibe"></p>
-          </div>
+                <div class="room-insight-row" id="room-friction-block">
+                  <h3>나와 의외로 삐걱대는 조합</h3>
+                  <div class="my-match" id="room-friction-match"></div>
+                </div>
 
-          <div class="result-block" id="room-mine-block">
-            <h3>나와 제일 잘 맞는 사람</h3>
-            <div class="my-match" id="room-my-match"></div>
-          </div>
+                <div class="room-insight-row" id="room-read-receipt-block">
+                  <h3>내 읽씹 내성 궁합</h3>
+                  <div class="my-match" id="room-read-receipt"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="room-scope room-all-scope" aria-labelledby="room-all-scope-title">
+            <div class="scope-head">
+              <p class="panel-kicker">방 전체 기준</p>
+              <h3 id="room-all-scope-title">친구들이 들어올수록 열리는 것</h3>
+            </div>
+
+            <div class="room-people">
+              <p class="panel-kicker">단톡방 역할표</p>
+              <ul class="people-chips" id="room-people-list"></ul>
+            </div>
+
+            <div class="result-block" id="room-top-block">
+              <h3>최고의 궁합 TOP</h3>
+              <ol class="match-rank" id="room-top-list"></ol>
+            </div>
+
+            <div class="room-foldout-list">
+              <details class="room-foldout" id="room-surprise-block">
+                <summary>의외의 케미</summary>
+                <div class="surprise-match" id="room-surprise-match"></div>
+              </details>
+
+              <details class="room-foldout" id="room-target-block">
+                <summary>오늘의 단톡방 타겟</summary>
+                <div class="surprise-match" id="room-target"></div>
+              </details>
+
+              <details class="room-foldout" id="room-vibe-block">
+                <summary>오늘의 단톡방 운세</summary>
+                <p class="room-vibe" id="room-vibe"></p>
+              </details>
+            </div>
+          </section>
 
           <div class="result-actions">
-            <button class="secondary-button js-share-room" type="button">친구 초대하기</button>
+            <button class="secondary-button js-share-room kakao-action" type="button">카톡으로 친구 초대</button>
+            <button class="ghost-button js-native-share-room" type="button">다른 앱 공유</button>
+            <button class="ghost-button js-copy-room-link" type="button">링크 복사</button>
             <button class="ghost-button js-refresh-room" type="button">새로고침</button>
           </div>
-          <p class="room-link-row">
+          <p class="room-link-row is-hidden" id="room-link-fallback">
             <input class="room-link-input" id="room-link-input" type="text" readonly>
-            <button class="text-button js-copy-room-link" type="button">링크 복사</button>
+            <button class="text-button js-copy-room-link" type="button">다시 복사</button>
           </p>
         </div>
       </section>
