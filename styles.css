@@ -236,25 +236,6 @@ button {
   background: rgba(255, 253, 248, 0.72);
 }
 
-.hero-proof {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 12px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.hero-proof li {
-  padding: 5px 8px;
-  border: 1px solid rgba(231, 214, 199, 0.86);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.58);
-  color: var(--denim-dark);
-  font-size: 11px;
-  font-weight: 900;
-}
-
 .mascot {
   position: relative;
   z-index: 1;
